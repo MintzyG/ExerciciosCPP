@@ -10,7 +10,7 @@
 				"-std=c++20",
 				"${workspaceFolder}\\*.cpp",
 				"-o",
-				"${fileDirname}\\CursoYoutube.exe"
+				"${fileDirname}\\BuiltProgram.exe"
 			],
 			"options": {
 				"cwd": "${fileDirname}"
@@ -30,7 +30,7 @@
 				"-std=c++20",
 				"${workspaceFolder}\\*.cpp",
 				"-o",
-				"${fileDirname}\\CursoYoutube.exe"
+				"${fileDirname}\\BuiltProgram.exe"
 			],
 			"options": {
 				"cwd": "${fileDirname}"
