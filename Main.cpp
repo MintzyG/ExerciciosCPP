@@ -3,20 +3,34 @@
 
 void Somar(int n, int m){
 
+int valor = 0;
+
+int Matriz2[n][m];
 int Matriz[n][m];
 for (int i = 0; i < m; i++){
     for (int j = 0; j < n; j++){
-        printf("%d", j);
-        Matriz[i][j] = i + j + 1;
+        valor += 1;
+        printf("Digite o valor %d da matriz 1: ", valor);
+        scanf("%d", &Matriz[i][j]);
     }
-    printf("%d", i);
+}
+
+printf("\n");
+
+valor = 0;
+for (int i = 0; i < m; i++){
+    for (int j = 0; j < n; j++){
+        valor += 1;
+        printf("Digite o valor %d da matriz 2: ", valor);
+        scanf("%d", &Matriz2[i][j]);
+    }
 }
 
 printf("\n");
 
 for (int i = 0; i < m; i++){
     for (int j = 0; j < n; j++){
-        printf("%d  ", Matriz[i][j]);
+        printf("%d ", Matriz[i][j] + Matriz2[i][j]);
     }
     printf("\n");
 }
@@ -33,7 +47,7 @@ int main(){
     printf("%d", i);
     switch (i){
         case (1):
-            printf("Qual e a dimensao das matrizes a serem somadas? \n");
+            printf("\nQual e a dimensao das matrizes a serem somadas? \n");
             printf("Quantidade de Colunas: ");
             scanf("%d", &n);
             printf("Quantidade de Linhas: ");
