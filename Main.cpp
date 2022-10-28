@@ -49,7 +49,7 @@ using namespace std;
         for (int j = 0; j < cm1; j++){
             valor += 1;
             cout<<"Digite o valor "<< valor <<" da matriz 1: ";
-            cin>>mat1[lm1][cm1];
+            cin>>mat1[i][j];
         }
     }
 
@@ -58,24 +58,26 @@ using namespace std;
         for (int j = 0; j < cm2; j++){
             valor += 1;
             cout<<"Digite o valor "<< valor <<" da matriz 2: ";
-            cin>>mat2[lm2][cm2];
+            cin>>mat2[i][j];
         }
     }
+
+    cout<<"\n";
+
         // dessa parte pra frente de multi nao funfa
         for (int i = 0; i < lm1; i++){
             for (int j = 0; j < cm2; j++){
-                for (int k = 0; k < cm1; k++){
-                    receptor[i][j] += mat1[lm1][k] * mat2[k][cm2];
-                    printf("%d \n", receptor[i][j]);
+                for (int k = 0; k < lm2; k++){
+                    receptor[i][j] += mat1[i][k] * mat2[k][j];
                 }
             }
         }
 
         for (int i = 0; i < lm1; i++){
             for (int j = 0; j < cm2; j++){
-                printf("%d  ", receptor[i][j]);
+                cout<<receptor[i][j] << " ";
             }    
-            printf("\n");
+            cout<<"\n";
         }
 
 
@@ -102,7 +104,7 @@ using namespace std;
                 case (2):
                     r = 0;
                     while (r == 0){
-                        cout<<"\nQual e a dimensao das matrizes a serem multiplicadas?";
+                        cout<<"\nQual e a dimensao das matrizes a serem multiplicadas? \n";
                         cout<<"Quantidade de Linhas da Matriz 1: ";
                         cin>>linhasMat1;
                         cout<<"Quantidade de Colunas da Matriz 1: ";
@@ -132,6 +134,3 @@ using namespace std;
             } 
         }
     }
-
-
-teste
