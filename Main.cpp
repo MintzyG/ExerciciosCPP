@@ -65,10 +65,23 @@ using namespace std;
     cout<<"\n";
 
         // dessa parte pra frente de multi nao funfa
+
         for (int i = 0; i < lm1; i++){
             for (int j = 0; j < cm2; j++){
-                for (int k = 0; k < lm2; k++){
+                receptor[i][j] = 0;
+            }
+        }
+
+
+        for (int i = 0; i < lm1; i++){
+            for (int j = 0; j < cm2; j++){
+                for (int k = 0; k < cm1; k++){
+                    cout<<"Impressao " << k+1 << " linha " << i+1 << " coluna " << j+1 << "\n";
+                    cout<<receptor[i][j];
+                    cout<<"\n Fora da matriz: \n";
+                    cout<<mat1[i][k] * mat2[k][j] << "\n";
                     receptor[i][j] += mat1[i][k] * mat2[k][j];
+                    
                 }
             }
         }
