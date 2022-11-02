@@ -1,0 +1,45 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "Build With GCC 12.2.0",
+			"command": "C:\\Users\\ericb\\OneDrive\\Área de Trabalho\\Compiladores\\mingw64\\bin\\g++.exe",
+			"args": [
+				"-g",
+				"-std=c++20",
+				"${workspaceFolder}\\*.cpp",
+				"-o",
+				"${fileDirname}\\BuiltProgram.exe"
+			],
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compilador: \"C:\\Users\\ericb\\OneDrive\\Área de Trabalho\\Compiladores\\mingw64\\bin\\g++.exe\""
+		},
+		{
+			"type": "cppbuild",
+			"label": "Build with clang 14.0.6",
+			"command": "C:\\Users\\ericb\\OneDrive\\Área de Trabalho\\Compiladores\\mingw64\\bin\\clang++.exe",
+			"args": [
+				"-g",
+				"-std=c++20",
+				"${workspaceFolder}\\*.cpp",
+				"-o",
+				"${fileDirname}\\BuiltProgram.exe"
+			],
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compilador: \"C:\\Users\\ericb\\OneDrive\\Área de Trabalho\\Compiladores\\mingw64\\bin\\clang++.exe\""
+		}
+	]
+}
