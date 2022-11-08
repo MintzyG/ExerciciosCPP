@@ -1,7 +1,47 @@
 #include <iostream>
-#include <stdlib.h>
+#include <vector>
 using namespace std;
 
+    /* pra relmebrar como modifica vetores caso necessario abrir aqui <
+    void modificaVetor(vector<vector<int>>& ModVetor){ 
+
+        for (int i = 0; i < ModVetor.size(); i++){
+            for (int j = 0; j < ModVetor[i].size(); j++){
+                ModVetor[i][j] += 1;
+            }
+        }
+
+    }
+    */
+
+    void enchaVetor(vector<vector<int>>& MatPreencher, int linhas, int colunas){
+
+        int lugar = 0;
+        int input;
+        for (int i = 0; i < linhas; i++){
+            vector<int> v1;
+            for (int j = 0; j < colunas; j++){
+                lugar += 1;
+                cout<<"valor "<< lugar <<" da matriz: ";
+                cin>>input;
+                v1.push_back(input);
+            }
+            MatPreencher.push_back(v1);
+        }
+    }
+    void escrevaVetor(vector<vector<int>>& MatEscreve){
+
+        for (vector<int> v1 : MatEscreve){
+            for (int x : v1){
+
+                cout<< x << "  ";
+
+            }
+            cout<<endl;
+        }
+
+    }
+    
     void somar(int n, int m){
 
     int valor = 0;
@@ -83,7 +123,6 @@ using namespace std;
             }
         }
 
-
         for (int i = 0; i < lm1; i++){
             for (int j = 0; j < cm2; j++){
                 for (int k = 0; k < cm1; k++){
@@ -151,9 +190,20 @@ using namespace std;
 
     int main(){
         int i;
+        int linhas, colunas;
+        vector<vector<int>> matriz;
+        
         cout<<"Bem vindo a calculadora de Matrizes\n";
+        cout<<"Qual vai ser o tamanho da matriz a ser operada?\n";
+        cout<<"Linhas: "; cin>>linhas;
+        cout<<"Colunas: "; cin>>colunas;
+       
+        enchaVetor(matriz, linhas, colunas);
+        cout<<endl;
+        escrevaVetor(matriz);
+       
         while (true){
-            cout<<"O que voce deseja fazer?\n";
+            cout<<"O que voce deseja fazer com sua matriz?\n";
             cout<<"1: Somar e Subtrair Matrizes \n";
             cout<<"2: Multiplicar Matrizes \n";
             cout<<"0: Sair do Programa \n";
