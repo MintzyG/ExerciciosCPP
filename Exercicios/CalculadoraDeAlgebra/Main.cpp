@@ -39,9 +39,29 @@ using namespace std;
             }
             cout<<endl;
         }
+        cout<<endl;
+    }
+    void info(vector<vector<int>> matrixInfo){
+
+        cout<<"\n\nInformacao sobre a matriz";
+        cout<<"\nQuantidade de linhas: "<<matrixInfo.size();
+        cout<<"\nQuantidade de colunas: "<<matrixInfo[0].size();
+        cout<<"\nA matriz esta vazia? ";
+            if (matrixInfo.empty() == 0){
+                cout<<"False";
+            }else{
+                cout<<"True";
+            }
+        cout<<endl;
+        cout<<"Matriz visualizada: ";
+        cout<<endl;
+        cout<<endl;
+        escrevaVetor(matrixInfo);
+        cout<<endl;
+        cout<<endl;
 
     }
-    
+
     void somar(int n, int m){
 
     int valor = 0;
@@ -191,21 +211,24 @@ using namespace std;
     int main(){
         int i;
         int linhas, colunas;
-        vector<vector<int>> matriz;
-        
+        vector<vector<int>> inicial;
+        vector<vector<int>> operadora;
+
         cout<<"Bem vindo a calculadora de Matrizes\n";
-        cout<<"Qual vai ser o tamanho da matriz a ser operada?\n";
+        cout<<"Entre com uma matriz!\n";
         cout<<"Linhas: "; cin>>linhas;
         cout<<"Colunas: "; cin>>colunas;
-       
-        enchaVetor(matriz, linhas, colunas);
+        cout<<endl<<"Preencha sua matriz!"<<endl<<endl;
+        enchaVetor(inicial, linhas, colunas);
         cout<<endl;
-        escrevaVetor(matriz);
+        cout<<"Sua matriz eh: "<<endl<<endl;
+        escrevaVetor(inicial);
        
         while (true){
             cout<<"O que voce deseja fazer com sua matriz?\n";
             cout<<"1: Somar e Subtrair Matrizes \n";
             cout<<"2: Multiplicar Matrizes \n";
+            cout<<"3: Informacao\n";
             cout<<"0: Sair do Programa \n";
             cout<<"Escolha: ";
             cin>>i;
@@ -216,6 +239,10 @@ using namespace std;
                 
                 case (2):
                     fazerCalculo(2);
+                    break;
+
+                case (3):
+                    info(inicial);
                     break;
 
                 case (0):
