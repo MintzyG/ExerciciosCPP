@@ -14,7 +14,7 @@ using namespace std;
     }
     */
 
-    void enchaVetor(vector<vector<int>>& MatPreencher, int linhas, int colunas){
+    void userFillMatrix(vector<vector<int>>& MatPreencher, int linhas, int colunas){
 
         int lugar = 0;
         int input;
@@ -28,6 +28,9 @@ using namespace std;
             }
             MatPreencher.push_back(v1);
         }
+
+        cout<<endl<<endl;
+
     }
     void escrevaVetor(vector<vector<int>>& MatEscreve){
 
@@ -59,6 +62,50 @@ using namespace std;
         escrevaVetor(matrixInfo);
         cout<<endl;
         cout<<endl;
+
+    }
+    void userSum(vector<vector<int>>& MatrixSum){
+
+        int choice = 0;
+        int especifico;
+        vector<vector<int>> sumMatrix;
+
+        cout<<"\nSomar valor fixo ou uma matriz a sua matriz?";
+        cout<<"\n1: Valor especifico para a matriz toda";
+        cout<<"\n2: Uma matriz especifica\n";
+        cin>>choice;
+
+        switch (choice)
+        {
+        case 1:
+            
+            cout<<"\nQual valor voce quer adicionar a sua matriz?\n";
+            cin>>especifico;
+            
+            for (int i = 0; i < MatrixSum.size(); i++){
+                for (int j = 0; j < MatrixSum[i].size(); j++){
+                    MatrixSum[i][j] += especifico;
+                }
+            }
+            break;
+        
+        case 2:
+
+            cout<<"\nPreencha a matriz que vai ser adicionada a sua\n";
+            userFillMatrix(sumMatrix, MatrixSum.size(), MatrixSum[0].size());
+
+            for (int i = 0; i < MatrixSum.size(); i++){
+                for (int j = 0; j < MatrixSum[i].size(); j++){
+                    MatrixSum[i][j] += sumMatrix[i][j];
+                }
+            }
+
+
+        default:
+            break;
+        }
+
+
 
     }
 
@@ -219,7 +266,7 @@ using namespace std;
         cout<<"Linhas: "; cin>>linhas;
         cout<<"Colunas: "; cin>>colunas;
         cout<<endl<<"Preencha sua matriz!"<<endl<<endl;
-        enchaVetor(inicial, linhas, colunas);
+        userFillMatrix(inicial, linhas, colunas);
         cout<<endl;
         cout<<"Sua matriz eh: "<<endl<<endl;
         escrevaVetor(inicial);
@@ -234,7 +281,7 @@ using namespace std;
             cin>>i;
             switch (i){
                 case (1):
-                    fazerCalculo(1);
+                    userSum(inicial);
                     break;
                 
                 case (2):
