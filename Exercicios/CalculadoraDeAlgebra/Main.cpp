@@ -55,8 +55,7 @@ using namespace std;
         vector<vector<int>> sumMatrix;
 
         cout<<"\nSomar valor fixo ou uma matriz a sua matriz?";
-        cout<<"\n1: Valor especifico para a matriz toda";
-        cout<<"\n2: Uma matriz especifica\n";
+        cout<<"\n1: Valor especifico para a matriz toda"<<"\n2: Uma matriz especifica\n";
         cin>>choice;
 
         switch (choice)
@@ -133,8 +132,7 @@ using namespace std;
         vector<vector<int>> inicial;
         vector<vector<int>> operadora;
 
-        cout<<"Bem vindo a calculadora de Matrizes\n";
-        cout<<"Entre com uma matriz!\n";
+        cout<<"Bem vindo a calculadora de Matrizes\n"<<"Entre com uma matriz!\n";
         cout<<"Linhas: "; cin>>linhas;
         cout<<"Colunas: "; cin>>colunas;
         cout<<endl<<"Preencha sua matriz!"<<endl<<endl;
@@ -143,12 +141,8 @@ using namespace std;
         printVector(inicial);
        
         while (true){
-            cout<<"O que voce deseja fazer com sua matriz?\n";
-            cout<<"1: Somar e Subtrair Matrizes \n";
-            cout<<"2: Multiplicar Matrizes \n";
-            cout<<"3: Informacao\n";
-            cout<<"0: Sair do Programa \n";
-            cout<<"Escolha: ";
+            cout<<"\n\nO que voce deseja fazer com sua matriz?\n";
+            cout<<"1: Somar e Subtrair Matrizes "<<"\n2: Multiplicar Matrizes \n"<<"3: Informacao\n"<<"0: Sair do Programa \n"<<"Escolha: ";
             cin>>i;
             switch (i){
                 case (1):
