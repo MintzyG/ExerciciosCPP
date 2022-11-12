@@ -2,18 +2,6 @@
 #include <vector>
 using namespace std;
 
-    /* pra relmebrar como modifica vetores caso necessario abrir aqui <
-    void modificaVetor(vector<vector<int>>& ModVetor){ 
-
-        for (int i = 0; i < ModVetor.size(); i++){
-            for (int j = 0; j < ModVetor[i].size(); j++){
-                ModVetor[i][j] += 1;
-            }
-        }
-
-    }
-    */
-
     void userFillMatrix(vector<vector<int>>& MatPreencher, int linhas, int colunas){
 
         int lugar = 0;
@@ -32,7 +20,7 @@ using namespace std;
         cout<<endl<<endl;
 
     }
-    void escrevaVetor(vector<vector<int>>& MatEscreve){
+    void printVector(vector<vector<int>>& MatEscreve){
 
         for (vector<int> v1 : MatEscreve){
             for (int x : v1){
@@ -55,13 +43,9 @@ using namespace std;
             }else{
                 cout<<"True";
             }
-        cout<<endl;
-        cout<<"Matriz visualizada: ";
-        cout<<endl;
-        cout<<endl;
-        escrevaVetor(matrixInfo);
-        cout<<endl;
-        cout<<endl;
+        cout<<endl<<"Matriz visualizada: "<<endl<<endl;
+        printVector(matrixInfo);
+        cout<<endl<<endl;
 
     }
     void userSum(vector<vector<int>>& MatrixSum){
@@ -108,150 +92,38 @@ using namespace std;
 
 
     }
+    void userMultiply(vector<vector<int>>& MatrixMultiply){
 
-    void somar(int n, int m){
+        vector<vector<int>> MultiplyMatrix;
+        vector<vector<int>> ReceptorMatrix;
 
-    int valor = 0;
+        int linhas = MatrixMultiply[0].size();
+        int colunas;
+        int value = 0;
 
-    int Matriz[n][m];
-    int Matriz2[n][m];
-    int Resultante[n][m];
-    
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < m; j++){
-            Resultante[i][j] = 0;
-        }
-    }
+        cout<<"\nEspecifique a matrix que voce quer que multiplique a sua!";
+        cout<<"\nA matriz multiplicadora tera "<<linhas<<" linhas";
+        cout<<"\nQuantas colunas voce quer que a matriz multiplicadora tenha? ";
+        cin>>colunas;
+        userFillMatrix(MultiplyMatrix, linhas, colunas);
 
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < m; j++){
-            valor += 1;
-            cout<<"Digite o valor "<< valor <<" da matriz 1: ";
-            cin>>Matriz[i][j];
-        }
-    }
+        info(MultiplyMatrix);
 
-    cout<<"\n";
+        for (int i = 0; i < MatrixMultiply.size(); i++){
+            vector<int> v1;
+            for (int j = 0; j < colunas; j++){
+                for (int k = 0; k < linhas; k++){
+                
+                    value += MatrixMultiply[i][k] * MultiplyMatrix[k][j];
 
-    valor = 0;
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < m; j++){
-            valor += 1;
-            cout<<"Digite o valor "<< valor <<" da matriz 2: ";
-            cin>>Matriz2[i][j];
-        }
-    }
-
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < m; j++){
-            Resultante[i][j] = Matriz[i][j] + Matriz2[i][j];
-        }
-    }
-
-    cout<<"\nResultado:\n";
-
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < m; j++){
-            cout<<Resultante[i][j]<<" ";
-        }
-        cout<<endl;
-    }
-
-    }
-    void multiplicar(int lm1, int cm1, int lm2, int cm2){
-    int valor = 0;
-
-    int mat1[lm1][cm1];
-    int mat2[lm2][cm2];
-    int receptor[lm1][cm2];
-
-    for (int i = 0; i < lm1; i++){
-        for (int j = 0; j < cm1; j++){
-            valor += 1;
-            cout<<"Digite o valor "<< valor <<" da matriz 1: ";
-            cin>>mat1[i][j];
-        }
-    }
-
-    valor = 0;
-    for (int i = 0; i < lm2; i++){
-        for (int j = 0; j < cm2; j++){
-            valor += 1;
-            cout<<"Digite o valor "<< valor <<" da matriz 2: ";
-            cin>>mat2[i][j];
-        }
-    }
-
-    cout<<"\n";
-
-        for (int i = 0; i < lm1; i++){
-            for (int j = 0; j < cm2; j++){
-                receptor[i][j] = 0;
-            }
-        }
-
-        for (int i = 0; i < lm1; i++){
-            for (int j = 0; j < cm2; j++){
-                for (int k = 0; k < cm1; k++){
-                    receptor[i][j] += mat1[i][k] * mat2[k][j];
                 }
+                v1.push_back(value);
+                value = 0;
             }
+            ReceptorMatrix.push_back(v1);
         }
 
-    cout<<"Resultado:\n";
-        for (int i = 0; i < lm1; i++){
-            for (int j = 0; j < cm2; j++){
-                cout<<receptor[i][j] << " ";
-            }    
-            cout<<"\n";
-        }
-    cout<<"\n";
-
-    }
-    void fazerCalculo(int Tipo){
-        cout<<"\nMonte suas matrizes \n";
-
-        int linhasM1, linhasM2, colunasM1, colunasM2;
-        bool seguir;
-        switch (Tipo)
-        {
-        case 1:
-            // Somar
-            cout<<"\nDimensoes das matrizes para soma:\n";
-            cout<<"Quantidade de linhas: ";
-            cin>>linhasM1;
-            cout<<"Quantidade de colunas: ";
-            cin>>colunasM1;
-            somar(linhasM1, colunasM1);
-            break;
-        case 2:
-            // Multiplicar
-            cout<<"\nDimensoes para as matrizes da multiplicacao:\n\n";
-            seguir = false;
-            while (seguir == false)
-            {
-                cout<<"Linhas da Matriz 1: ";
-                cin>>linhasM1;
-                cout<<"Colunas da Matriz 1: ";       
-                cin>>colunasM1;
-                cout<<"Linhas da Matriz 2: ";
-                cin>>linhasM2;
-                cout<<"Colunas da Matriz 2: ";       
-                cin>>colunasM2;
-                if (colunasM1 == linhasM2){
-                    seguir = true;
-                }else if (colunasM1 != linhasM2 || linhasM1 < 1 || linhasM2 < 1 || colunasM1 < 1 || colunasM2 < 1){
-                    cout<<"\nDimensoes invalidas:\nPara que as matrizes sejam multiplicaveis as Colunas da matriz 1 devem equivaler as Linhas da matriz 2\nTente Novamente\n";
-                }
-            }
-            cout<<"\n";
-            multiplicar(linhasM1, colunasM1, linhasM2, colunasM2);
-            break;
-            
-        default:
-            cout<<"Erro!";
-            break;
-        }
+        MatrixMultiply.swap(ReceptorMatrix);
 
     }
 
@@ -267,9 +139,8 @@ using namespace std;
         cout<<"Colunas: "; cin>>colunas;
         cout<<endl<<"Preencha sua matriz!"<<endl<<endl;
         userFillMatrix(inicial, linhas, colunas);
-        cout<<endl;
-        cout<<"Sua matriz eh: "<<endl<<endl;
-        escrevaVetor(inicial);
+        cout<<endl<<"Sua matriz eh: "<<endl<<endl;
+        printVector(inicial);
        
         while (true){
             cout<<"O que voce deseja fazer com sua matriz?\n";
@@ -285,7 +156,7 @@ using namespace std;
                     break;
                 
                 case (2):
-                    fazerCalculo(2);
+                    userMultiply(inicial);
                     break;
 
                 case (3):
