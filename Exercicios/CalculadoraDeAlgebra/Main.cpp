@@ -34,6 +34,7 @@ using namespace std;
     }
     void info(vector<vector<int>> matrixInfo){
 
+        void determinant(vector<vector<int>> Matriz);
         cout<<"\n\nInformacao sobre a matriz";
         cout<<"\nQuantidade de linhas: "<<matrixInfo.size();
         cout<<"\nQuantidade de colunas: "<<matrixInfo[0].size();
@@ -46,6 +47,33 @@ using namespace std;
         cout<<endl<<"Matriz visualizada: "<<endl<<endl;
         printVector(matrixInfo);
         cout<<endl<<endl;
+        determinant(matrixInfo);
+
+        int j;
+        cout<<endl<<"Voce quer ver a extendida?"<<endl<<"1: sim"<<endl<<"0: nao"<<endl<<"Digite: ";
+        cin>>j;
+
+        if (j == 1){
+            vector<vector<int>> Extendida;
+
+            for (int i = 0; i < 3; i++){
+                vector<int> V;
+                for (int j = 0; j < 3; j++){
+                    V.push_back(matrixInfo[i][j]);
+                }
+                Extendida.push_back(V);    
+            }
+
+            for (int i = 0; i < 3; i++){
+                for (int j = 0; j < 2; j++){
+                    Extendida[i].push_back(matrixInfo[i][j]);
+                }    
+            }
+            cout<<endl;
+            printVector(Extendida);
+            cout<<endl;
+        }
+
 
     }
     void userSum(vector<vector<int>>& MatrixSum){
@@ -125,6 +153,63 @@ using namespace std;
         MatrixMultiply.swap(ReceptorMatrix);
 
     }
+    void determinant(vector<vector<int>> MatrixDeterminant){
+
+        int diagonalP, diagonalP2, diagonalP3, diagonalS, diagonalS2, diagonalS3 = 1;
+        int count = 1;
+        diagonalP = diagonalP2 = diagonalP3 = diagonalS = diagonalS2 = diagonalS3 = 1;
+
+        if ((MatrixDeterminant.size() == 2) && (MatrixDeterminant[0].size() == 2)){
+            for (int i = 0; i < MatrixDeterminant.size(); i++){
+                diagonalP *= MatrixDeterminant[i][i]; 
+            }
+
+            for (int i = 0; i < 2; i++){
+                diagonalS *= MatrixDeterminant[i][count];
+                count--;
+            }
+
+            cout<<endl<<"O determinante da matriz eh:"<<diagonalP - diagonalS<<endl;
+
+        }else if ((MatrixDeterminant.size() == 3) && (MatrixDeterminant[0].size() == 3)){
+
+            vector<vector<int>> Extendida;
+
+            for (int i = 0; i < 3; i++){
+                vector<int> V;
+                for (int j = 0; j < 3; j++){
+                    V.push_back(MatrixDeterminant[i][j]);
+                }
+                Extendida.push_back(V);    
+            }
+
+            for (int i = 0; i < 3; i++){
+                for (int j = 0; j < 2; j++){
+                    Extendida[i].push_back(MatrixDeterminant[i][j]);
+                }    
+            }
+
+            for (int i = 0; i < 3; i++){
+                for (int j = 0; j < 3; j++){
+
+                    if (j == 1){
+                        diagonalP2 *= Extendida[i][j+i];
+                        diagonalS2 *= Extendida[i][3-i];
+                    }else if (j == 2){
+                        diagonalP3 *= Extendida[i][j+i];
+                        diagonalS3 *= Extendida[i][2-i];
+                    }else{
+                        diagonalP *= Extendida[i][i];
+                        diagonalS *= Extendida[i][4-i];
+                    }
+                }
+            }
+
+            int determinante = diagonalP + diagonalP2 + diagonalP3 - diagonalS - diagonalS2 - diagonalS3;
+            cout<<endl<<"O determinante da matriz eh: "<<determinante;            
+
+        }
+    }
 
     int main(){
         int i;
@@ -142,7 +227,8 @@ using namespace std;
        
         while (true){
             cout<<"\n\nO que voce deseja fazer com sua matriz?\n";
-            cout<<"1: Somar e Subtrair Matrizes "<<"\n2: Multiplicar Matrizes \n"<<"3: Informacao\n"<<"0: Sair do Programa \n"<<"Escolha: ";
+            cout<<"1: Somar e Subtrair Matrizes "<<"\n2: Multiplicar Matrizes \n"<<"3: Visualizar Informacoes\n"<<
+            "4: Calcular a determinante da matriz \n"<<"0: Sair do Programa "<<"Escolha: ";
             cin>>i;
             switch (i){
                 case (1):
@@ -155,6 +241,10 @@ using namespace std;
 
                 case (3):
                     info(inicial);
+                    break;
+
+                case (4):
+                    determinant(inicial);
                     break;
 
                 case (0):
