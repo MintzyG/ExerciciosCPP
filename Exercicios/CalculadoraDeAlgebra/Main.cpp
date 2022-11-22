@@ -34,7 +34,6 @@ using namespace std;
     }
     void info(vector<vector<int>> matrixInfo){
 
-        void determinant(vector<vector<int>> Matriz);
         cout<<"\n\nInformacao sobre a matriz";
         cout<<"\nQuantidade de linhas: "<<matrixInfo.size();
         cout<<"\nQuantidade de colunas: "<<matrixInfo[0].size();
@@ -46,35 +45,7 @@ using namespace std;
             }
         cout<<endl<<"Matriz visualizada: "<<endl<<endl;
         printVector(matrixInfo);
-        cout<<endl<<endl;
-        determinant(matrixInfo);
-
-        int j;
-        cout<<endl<<"Voce quer ver a extendida?"<<endl<<"1: sim"<<endl<<"0: nao"<<endl<<"Digite: ";
-        cin>>j;
-
-        if (j == 1){
-            vector<vector<int>> Extendida;
-
-            for (int i = 0; i < 3; i++){
-                vector<int> V;
-                for (int j = 0; j < 3; j++){
-                    V.push_back(matrixInfo[i][j]);
-                }
-                Extendida.push_back(V);    
-            }
-
-            for (int i = 0; i < 3; i++){
-                for (int j = 0; j < 2; j++){
-                    Extendida[i].push_back(matrixInfo[i][j]);
-                }    
-            }
-            cout<<endl;
-            printVector(Extendida);
-            cout<<endl;
-        }
-
-
+        cout<<endl;
     }
     void userSum(vector<vector<int>>& MatrixSum){
 
@@ -169,7 +140,7 @@ using namespace std;
                 count--;
             }
 
-            cout<<endl<<"O determinante da matriz eh:"<<diagonalP - diagonalS<<endl;
+            cout<<endl<<"O determinante da matriz eh: "<<diagonalP - diagonalS<<endl;
 
         }else if ((MatrixDeterminant.size() == 3) && (MatrixDeterminant[0].size() == 3)){
 
@@ -210,6 +181,21 @@ using namespace std;
 
         }
     }
+    void transpose(vector<vector<int>>& TranposeMatrix){
+
+        vector<vector<int>> Temp;
+
+        for (int i = 0; i < TranposeMatrix[0].size(); i++){
+            vector<int> V;
+            for (int j = 0; j < TranposeMatrix.size(); j++){
+                V.push_back(TranposeMatrix[j][i]);
+            }
+            Temp.push_back(V);
+        }
+
+        TranposeMatrix.swap(Temp);
+
+    }
 
     int main(){
         int i;
@@ -228,7 +214,7 @@ using namespace std;
         while (true){
             cout<<"\n\nO que voce deseja fazer com sua matriz?\n";
             cout<<"1: Somar e Subtrair Matrizes "<<"\n2: Multiplicar Matrizes \n"<<"3: Visualizar Informacoes\n"<<
-            "4: Calcular a determinante da matriz \n"<<"0: Sair do Programa "<<"Escolha: ";
+            "4: Calcular a determinante da matriz \n"<<"5: Transpor a matriz\n"<<"0: Sair do Programa "<<"Escolha: ";
             cin>>i;
             switch (i){
                 case (1):
@@ -245,6 +231,10 @@ using namespace std;
 
                 case (4):
                     determinant(inicial);
+                    break;
+
+                case (5):
+                    transpose(inicial);
                     break;
 
                 case (0):
