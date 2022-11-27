@@ -33,64 +33,11 @@ struct Card{
     Suits suit;
     int value;
 
-    void PrintCard(){
-        
-        PrintName();
-        std::cout<<" of ";
-        PrintSuit();
-
-        std::cout<<std::endl;
-
-    }
-
-    void PrintName(){
-
-        if (name == CardNames::JACK){
-            std::cout<<"Jack";
-        }else if (name == CardNames::QUEEN){
-            std::cout<<"Queen";
-        }else if (name == CardNames::KING){
-            std::cout<<"King";
-        }else if (name == CardNames::ACE){
-            std::cout<<"Ace";
-        }else{
-            std::cout<<value;
-        }
-
-    }
-
-    void PrintSuit(){
-        if (suit == Suits::CLUBS){
-            std::cout<<"Clubs";
-        } else if (suit == Suits::DIAMONDS){
-            std::cout<<"Diamonds";
-        } else if (suit == Suits::HEARTS){
-            std::cout<<"Hearts";
-        } else if (suit == Suits::SPADES){
-            std::cout<<"Spades";
-        }
-    }
-
 };
 
 struct Deck{
 
     Card arrCards[52];
-
-    void PrintAll(){
-       
-        for (int Linha = (int)Suits::CLUBS; Linha <= (int)Suits::SPADES; Linha++){
-            for (int Coluna = (int)CardNames::ACE; Coluna <= (int)CardNames::KING; Coluna++){
-                
-                int index = ((13 * Linha) + Coluna) - 1 ;
-                arrCards[index].PrintCard();
-
-            }
-            std::cout<<std::endl;
-        }
-    }
-
-
 
     void SetupCards(){
 
@@ -119,9 +66,38 @@ struct Deck{
     }
 
 
-    void DeckShuffle(){
+    void printDeck(Deck& deck){
 
-        arrCards[]
+        for (int i = 0; i < 52; i++){
+            if (arrCards[i].name == CardNames::ACE){
+                std::cout<<"Ace";
+            }else if (arrCards[i].name == CardNames::JACK){
+                std::cout<<"Jack";
+            }else if (arrCards[i].name == CardNames::QUEEN){
+                std::cout<<"Queen";
+            }else if (arrCards[i].name == CardNames::KING){
+                std::cout<<"King";
+            }else{
+                std::cout<<arrCards[i].value;
+            }
+
+            std::cout<<" of ";
+
+            if (arrCards[i].suit == Suits::CLUBS){
+                std::cout<<"clubs";
+            }else if (arrCards[i].suit == Suits::DIAMONDS){
+                std::cout<<"diamonds";
+            }else if (arrCards[i].suit == Suits::HEARTS){
+                std::cout<<"hearts";
+            }else if (arrCards[i].suit == Suits::SPADES){
+                std::cout<<"spades";
+            }
+
+            std::cout<<std::endl;
+        }
+    }
+
+    void DeckShuffle(Deck& deck){
 
     }
 
@@ -132,11 +108,12 @@ int main(){
 
     Deck deck;
     deck.SetupCards();
+    deck.printDeck(deck);
 
     std::cout<<std::endl;
 
-    deck.PrintAll();
 
+    
     
 
 }
