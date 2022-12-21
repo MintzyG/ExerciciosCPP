@@ -30,26 +30,46 @@ struct Deck{
 
 };
 
+struct Player{
 
+    vector<Card> hand;
+    string name;
+    int score;
 
-void initialize(Deck&);
+};
+
+struct Game{
+
+    vector<Player> players;
+    Deck deck;
+    int num_players = 2;
+    int num_cards_per_hand = 7;
+
+};
+
+void initialize_deck(Deck&);
 void print_deck(const Deck&);
 void print_card(const Card&);
 void shuffle_deck(Deck&);
+bool deal_cards(Game&); 
+void print_hand(const vector<Card>&);
+void initialize_game(Game&);
+void add_players(Game&);
+void print_game(const Game&); 
+void play_game(Game&);
 
 int main(){
 
-    Deck my_deck;
     srand(time(NULL));
 
-    initialize(my_deck);
-    //print_deck(my_deck);
-    shuffle_deck(my_deck);
-    //print_deck(my_deck);
+    Game game;
+    play_game(game);
+
+    print_game(game);
 
 }
 
-void initialize(Deck& deck){
+void initialize_deck(Deck& deck){
 
 
 
@@ -134,5 +154,73 @@ void shuffle_deck(Deck& deck){
     }
 
     deck = shuffled;
+
+}
+
+bool deal_cards(Game& game){
+
+    if (game.deck.cards.size() < game.num_players * game.num_cards_per_hand){
+        return false;
+    }
+
+
+     for (int card = 0; card < game.num_cards_per_hand; card++){
+        for (int player = 0; player < game.num_players; player++){
+
+            game.players[player].hand.push_back(game.deck.cards[0]);
+            game.deck.cards.erase(game.deck.cards.begin());
+
+        }
+     }
+
+    return true;
+
+}
+
+void print_hand(const vector<Card>& hand){
+
+    for (Card c : hand){
+
+        print_card(c);
+
+    }
+
+}
+
+void initialize_game(Game& game){
+
+    initialize_deck(game.deck);
+    shuffle_deck(game.deck);
+    add_players(game);
+}
+
+void add_players(Game& game){
+
+
+    for (int player = 0; player < game.num_players; player++){
+        
+        Player new_player;
+        game.players.push_back(new_player);
+
+    }
+
+}
+
+void print_game(const Game& game){
+
+    for(int player = 0; player < game.num_players; player++){
+        
+        print_hand(game.players[player].hand);
+        cout<<endl;
+    }
+
+    print_deck(game.deck);
+
+}
+
+void play_game(Game& game){
+
+    initialize_game(game);
+    deal_cards(game);
 
 }
