@@ -39,7 +39,7 @@ struct Deck{
 
     Card arrCards[52];
 
-    void SetupCards(){
+    void InitializeDeck(){
 
         for (int Linha = (int)Suits::CLUBS; Linha <= (int)Suits::SPADES; Linha++){
             for (int Coluna = (int)CardNames::ACE; Coluna <= (int)CardNames::KING; Coluna++){
@@ -65,8 +65,7 @@ struct Deck{
         }
     }
 
-
-    void printDeck(Deck& deck){
+    void printDeck(const Deck& deck){
 
         for (int i = 0; i < 52; i++){
             if (arrCards[i].name == CardNames::ACE){
@@ -101,19 +100,14 @@ struct Deck{
 
     }
 
-
 };
 
 int main(){
 
     Deck deck;
-    deck.SetupCards();
+    deck.InitializeDeck();
     deck.printDeck(deck);
 
     std::cout<<std::endl;
-
-
-    
-    
 
 }
