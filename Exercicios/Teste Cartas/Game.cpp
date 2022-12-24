@@ -25,14 +25,20 @@ struct Card{
 struct Deck{
 
     vector<Card> cards;
-    string card_back;
     int max_deck_size = 60;
+
+};
+
+struct PlayedDeck{
+
+    vector<Card> played_cards;
 
 };
 
 struct Player{
 
     vector<Card> hand;
+    vector<Card> possible_plays;
     string name;
     int score;
 
@@ -41,10 +47,17 @@ struct Player{
 struct Game{
 
     vector<Player> players;
+    PlayedDeck played_deck;
     Deck deck;
+    Color starting_color;
+    Card last_played_card;
+    int first_player = 0;
+    int current_player = 0;
     int num_players = 2;
-    int num_cards_per_hand = 7;
-
+    int num_cards_per_hand = 2;
+    int game_turns_played = 0;
+    bool game_over = false;
+    
 };
 
 void initialize_deck(Deck&);
@@ -57,6 +70,17 @@ void initialize_game(Game&);
 void add_players(Game&);
 void print_game(const Game&); 
 void play_game(Game&);
+void start_color(Game&);
+void first_player(Game&);
+void turn(Game&);
+bool check_win_condition(Game&);
+void last_played_info(Game&);
+void play_action(Game&, int);
+void get_next_player(Game&, bool);
+void screen_clear();
+void show_winner(Game&);
+void show_finished_game(Game&);
+void show_turns(Game&);
 
 int main(){
 
@@ -64,8 +88,6 @@ int main(){
 
     Game game;
     play_game(game);
-
-    print_game(game);
 
 }
 
@@ -133,11 +155,72 @@ void print_deck(const Deck& deck){
 
 void print_card(const Card& card){
 
-    cout << "Number = " << card.card_number << "   " 
-    << " Animal = " << card.card_animal << "   "
-    << " Color = " << card.card_color << "   "
-    << " Type = " << card.card_type << "   "
-    << " Strength = " << card.card_strength << endl; 
+    switch (card.card_color){
+    case Color::BLACK:
+        cout<<"Black ";
+        break;
+    case Color::WHITE:
+        cout<<"White ";
+        break;
+    case Color::YELLOW:
+        cout<<"Yellow ";
+        break;
+    case Color::BLUE:
+        cout<<"Blue ";
+        break;
+    case Color::GREEN:
+        cout<<"Green ";
+        break;
+    case Color::RED:
+        cout<<"Red ";
+        break;
+    case Color::EMPTY_COLOR:
+        cout<<"Empty ";
+        break;
+    default:
+        cout<<"error ";
+        break;
+    }
+
+    switch (card.card_number){
+    case Number::ZERO:
+        cout<<"zero";
+        break;
+    case Number::ONE:
+        cout<<"one";
+        break;
+    case Number::TWO:
+        cout<<"two";
+        break;
+    case Number::THREE:
+        cout<<"three";
+        break;
+    case Number::FOUR:
+        cout<<"four";
+        break;
+    case Number::FIVE:
+        cout<<"five";
+        break;
+    case Number::SIX:
+        cout<<"six";
+        break;
+    case Number::SEVEN:
+        cout<<"seven";
+        break;
+    case Number::EIGHT:
+        cout<<"eight";
+        break;
+    case Number::NINE:
+        cout<<"nine";
+        break;
+    case Number::EMPTY_NUMBER:
+        cout<<"empty";
+        break;
+    default:
+        cout<<"error";
+        break;
+    }
+    cout<< endl; 
 
 }
 
@@ -179,11 +262,15 @@ bool deal_cards(Game& game){
 
 void print_hand(const vector<Card>& hand){
 
+    int counter = 1;
     for (Card c : hand){
 
+        cout<<counter<<": ";
+        counter++;
         print_card(c);
 
     }
+    cout<<endl;
 
 }
 
@@ -192,6 +279,8 @@ void initialize_game(Game& game){
     initialize_deck(game.deck);
     shuffle_deck(game.deck);
     add_players(game);
+    start_color(game);
+    first_player(game);
 }
 
 void add_players(Game& game){
@@ -209,12 +298,232 @@ void add_players(Game& game){
 void print_game(const Game& game){
 
     for(int player = 0; player < game.num_players; player++){
-        
+
         print_hand(game.players[player].hand);
-        cout<<endl;
+        
     }
 
     print_deck(game.deck);
+
+    cout << "Starting color: " << game.starting_color << endl;
+
+}
+
+void start_color(Game& game){
+
+    int rand_color = rand() % Color::RED; 
+    game.starting_color = Color(rand_color);
+
+}
+
+void first_player(Game& game){
+
+    game.first_player = rand() % game.num_players;
+    game.current_player = game.first_player;
+
+}
+
+void last_played_info(Game& game){
+
+    if (game.played_deck.played_cards.empty()){
+        cout<< "The starting color is: ";
+        switch (game.starting_color)
+        {
+        case Color::BLACK:
+            cout<<" Black";
+            break;
+        case Color::WHITE:
+            cout<<" White";
+            break;
+        case Color::YELLOW:
+            cout<<" Yellow";
+            break;
+        case Color::BLUE:
+            cout<<" Blue";
+            break;
+        case Color::GREEN:
+            cout<<" Green";
+            break;
+        case Color::RED:
+            cout<<" Red";
+            break;
+        
+        default:
+            break;
+        }
+        cout<<endl;
+    }
+
+    cout << "The last played card was: ";
+    print_card(game.last_played_card);
+
+
+
+}
+
+void play_card(Game& game, int current_player, int action){
+
+    Card temp_card;
+    
+    for (int card = 0; card < game.players[current_player].possible_plays.size(); card++){
+
+        if (card == action){
+
+            temp_card.card_color = game.players[current_player].possible_plays[card].card_color;
+            temp_card.card_number = game.players[current_player].possible_plays[card].card_number;
+
+        }
+    }
+
+    for (int card = 0; card < game.players[current_player].hand.size(); card++){
+     
+        if ((game.players[current_player].hand[card].card_color == temp_card.card_color) && (game.players[current_player].hand[card].card_number == temp_card.card_number)){
+
+            cin.get();
+            
+            game.played_deck.played_cards.push_back(game.players[current_player].hand[card]);
+            game.last_played_card = game.players[current_player].hand[card];
+            game.players[current_player].hand.erase(game.players[current_player].hand.begin() + (card));
+
+        }
+    
+    }
+
+    game.game_over = check_win_condition(game);
+
+} 
+
+void player_draw(Game& game, int current_player){
+
+    game.players[current_player].hand.push_back(game.deck.cards[0]);
+    game.deck.cards.erase(game.deck.cards.begin());
+
+    if (game.deck.cards.empty()){
+
+        game.game_over = true;
+
+    }
+
+}
+
+void play_action(Game& game, int current_player){
+
+        size_t count = 0;
+        int action;
+        
+        if (game.played_deck.played_cards.empty()){
+            for (int card = 0; card < game.players[current_player].hand.size(); card++){
+                if (game.players[current_player].hand[card].card_color == game.starting_color){
+                    count++;
+                    cout << count << ": ";
+                    print_card(game.players[current_player].hand[card]);
+                    game.players[current_player].possible_plays.push_back(game.players[current_player].hand[card]);
+                } 
+            }
+            if (count == 0){
+                cout << endl << "Player Draws" << endl;
+                player_draw(game, current_player);
+                get_next_player(game, true);
+                return;
+            }
+            
+            cout << "What card do you want to play?" << endl;
+            while ((action < 0) || (action > ((game.players[current_player].possible_plays.size()) - 1))){
+            
+                cin >> action;
+                action--;
+            
+            }   
+
+            play_card(game, current_player, action);
+            game.players[current_player].possible_plays.clear();
+            return;
+        }
+
+        for (int card = 0; card < game.players[current_player].hand.size(); card++){
+            if ((game.players[current_player].hand[card].card_color == game.last_played_card.card_color) || (game.players[current_player].hand[card].card_number == game.last_played_card.card_number)){
+
+                count++;
+                cout << count << ": ";
+                print_card(game.players[current_player].hand[card]);
+                game.players[current_player].possible_plays.push_back(game.players[current_player].hand[card]);
+
+            }
+        }
+        if (count == 0){
+            cout << endl << "Player Draws" << endl;
+            player_draw(game, current_player);
+            return;
+        }
+        
+        cout << "What card do you want to play?" << endl;
+        while ((action < 0) || (action > ((game.players[current_player].possible_plays.size()) - 1))){
+            
+            cin >> action;
+            action--;
+            
+        }   
+
+        play_card(game, current_player, action);
+        game.players[current_player].possible_plays.clear();
+        return;
+
+    }
+
+void get_next_player(Game& game, bool next_on_first){
+
+    if (!next_on_first){
+
+        int next_player = (game.current_player + 1) % game.num_players;
+        game.current_player = next_player;
+
+    }else{
+
+        game.first_player = (game.current_player + 1) % game.num_players; 
+        game.current_player = game.first_player;
+
+    }
+}
+
+void turn(Game& game){
+
+    if (game.played_deck.played_cards.empty()){
+        int playing = game.first_player;
+        cout <<"Player's " << (playing + 1) << " starts!"<<endl;
+        last_played_info(game);     
+        cout<< endl;
+        cout << "Player's " << (playing + 1) << " hand: " << endl; 
+        print_hand(game.players[playing].hand);
+        play_action(game, playing);
+        cout<< endl << "Press enter to end turn" << endl;
+        cin.get();
+        return;
+    }
+
+    get_next_player(game, false);
+    int playing = game.current_player;
+    cout <<"Player's " << (playing + 1) << " turn!"<<endl;
+    last_played_info(game);     
+    cout<< endl;
+    cout << "Player's " << (playing + 1) << " hand: " << endl; 
+    print_hand(game.players[playing].hand);
+    play_action(game, playing);
+    cout<< endl << "Press enter to end turn" << endl;
+    cin.get();
+    return;    
+
+}
+
+bool check_win_condition(Game& game){
+
+    for (int player = 0; player < game.num_players; player++){
+
+        if (game.players[player].hand.empty()){
+            return true;
+        }
+
+    }
+    return false;
 
 }
 
@@ -223,4 +532,62 @@ void play_game(Game& game){
     initialize_game(game);
     deal_cards(game);
 
+    game.game_over = check_win_condition(game);
+    int turn_counter = 0;
+
+    while (!game.game_over) {
+
+        turn(game);
+        turn_counter++;
+        game.game_turns_played = turn_counter;
+        screen_clear();
+
+    }
+
+    show_finished_game(game);
+    show_winner(game);
+    show_turns(game);
+
 }
+
+void screen_clear(){
+
+    cout<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl
+    <<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl
+    <<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl
+    <<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl<<endl;
+
+}
+
+void show_winner(Game& game){
+
+    for (int players = 0; players < game.num_players; players++){
+
+        if (game.players[players].hand.empty()){
+
+            cout << "Player " << players << " was the winner!!!";
+
+        }
+
+    }
+
+}
+
+void show_finished_game(Game& game){
+
+    cout<<endl<<endl;
+
+    cout<<"The game sequence was: "<<endl<<endl;
+    print_hand(game.played_deck.played_cards);
+    cout<<endl<<endl;
+
+}
+
+void show_turns(Game& game){
+
+    cout<<endl<<endl;
+    cout<<"The game was played for "<< game.game_turns_played<<" turns";
+    cout<<endl;
+
+}
+
