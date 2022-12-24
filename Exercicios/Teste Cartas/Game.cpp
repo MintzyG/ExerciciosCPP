@@ -354,9 +354,10 @@ void last_played_info(Game& game){
         cout<<endl;
     }
 
-    cout << "The last played card was: ";
-    print_card(game.last_played_card);
-
+    if (!(game.played_deck.played_cards.empty())){
+        cout << "The last played card was: ";
+        print_card(game.last_played_card);
+    }
 
 
 }
