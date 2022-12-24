@@ -566,7 +566,7 @@ void show_winner(Game& game){
 
         if (game.players[players].hand.empty()){
 
-            cout << "Player " << players << " was the winner!!!";
+            cout << "Player " << players + 1 << " was the winner!!!";
 
         }
 
