@@ -54,7 +54,7 @@ struct Game{
     int first_player = 0;
     int current_player = 0;
     int num_players = 2;
-    int num_cards_per_hand = 2;
+    int num_cards_per_hand = 7;
     int game_turns_played = 0;
     bool game_over = false;
     
