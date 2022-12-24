@@ -41,6 +41,7 @@ struct Player{
     vector<Card> possible_plays;
     string name;
     int score;
+    int card_quantity = 0;
 
 };
 
@@ -51,9 +52,10 @@ struct Game{
     Deck deck;
     Color starting_color;
     Card last_played_card;
+    Player winner;
     int first_player = 0;
     int current_player = 0;
-    int num_players = 2;
+    int num_players = 8;
     int num_cards_per_hand = 7;
     int game_turns_played = 0;
     bool game_over = false;
@@ -78,7 +80,7 @@ void last_played_info(Game&);
 void play_action(Game&, int);
 void get_next_player(Game&, bool);
 void screen_clear();
-void show_winner(Game&);
+void choose_winner(Game&);
 void show_finished_game(Game&);
 void show_turns(Game&);
 
@@ -285,11 +287,14 @@ void initialize_game(Game& game){
 
 void add_players(Game& game){
 
-
-    for (int player = 0; player < game.num_players; player++){
+    string names;
+    for(int player = 0; player < game.num_players; player++){
         
         Player new_player;
         game.players.push_back(new_player);
+        cout<<"Choose player " << (player + 1) << " name" << endl;
+        cin>>names;
+        game.players[player].name = names;
 
     }
 
@@ -399,12 +404,32 @@ void player_draw(Game& game, int current_player){
     game.players[current_player].hand.push_back(game.deck.cards[0]);
     game.deck.cards.erase(game.deck.cards.begin());
 
-    if (game.deck.cards.empty()){
+    cout<<"There are " << game.deck.cards.size() << " cards left in the deck";
 
-        game.game_over = true;
+    if (game.deck.cards.empty()){
+        
+        for (int players = 0; players < game.players.size(); players++){
+            for (int card = 0; card < game.players[players].hand.size(); card++){
+
+                game.players[players].card_quantity = game.players[players].hand.size();
+
+            }
+        }
+
+        for (int hand = 0; hand < game.players.size(); hand++){
+            
+            if (hand == 0){
+                game.winner = game.players[hand]; 
+            }else if ((game.winner.card_quantity) > (game.players[hand].card_quantity)){
+                game.winner = game.players[hand];
+            }
+
+
+        }
+
+        game.game_over = true;  
 
     }
-
 }
 
 void play_action(Game& game, int current_player){
@@ -422,7 +447,7 @@ void play_action(Game& game, int current_player){
                 } 
             }
             if (count == 0){
-                cout << endl << "Player Draws" << endl;
+                cout << endl << game.players[current_player].name << " draws" << endl;
                 player_draw(game, current_player);
                 get_next_player(game, true);
                 return;
@@ -452,7 +477,7 @@ void play_action(Game& game, int current_player){
             }
         }
         if (count == 0){
-            cout << endl << "Player Draws" << endl;
+            cout << endl << game.players[current_player].name <<" draws" << endl;
             player_draw(game, current_player);
             return;
         }
@@ -490,10 +515,10 @@ void turn(Game& game){
 
     if (game.played_deck.played_cards.empty()){
         int playing = game.first_player;
-        cout <<"Player's " << (playing + 1) << " starts!"<<endl;
+        cout << game.players[game.current_player].name << " starts!"<<endl;
         last_played_info(game);     
         cout<< endl;
-        cout << "Player's " << (playing + 1) << " hand: " << endl; 
+        cout << game.players[game.current_player].name << "'s hand: " << endl; 
         print_hand(game.players[playing].hand);
         play_action(game, playing);
         cout<< endl << "Press enter to end turn" << endl;
@@ -503,10 +528,10 @@ void turn(Game& game){
 
     get_next_player(game, false);
     int playing = game.current_player;
-    cout <<"Player's " << (playing + 1) << " turn!"<<endl;
+    cout << game.players[game.current_player].name << " turn!"<<endl;
     last_played_info(game);     
     cout<< endl;
-    cout << "Player's " << (playing + 1) << " hand: " << endl; 
+    cout << game.players[game.current_player].name << "'s hand: " << endl; 
     print_hand(game.players[playing].hand);
     play_action(game, playing);
     cout<< endl << "Press enter to end turn" << endl;
@@ -546,7 +571,7 @@ void play_game(Game& game){
     }
 
     show_finished_game(game);
-    show_winner(game);
+    choose_winner(game);
     show_turns(game);
 
 }
@@ -560,17 +585,35 @@ void screen_clear(){
 
 }
 
-void show_winner(Game& game){
+void choose_winner(Game& game){
 
+    bool winner = false;
     for (int players = 0; players < game.num_players; players++){
 
         if (game.players[players].hand.empty()){
 
-            cout << "Player " << players + 1 << " was the winner!!!";
+            cout << game.players[players].name << " was the winner!!!";
+            winner = true;
 
         }
 
     }
+
+    if (!winner){
+
+        cout << "The winner was " << game.winner.name;
+        cout << " they had the least cards at " << game.winner.hand.size() << " cards";
+
+        cout << endl << " Everybody card count: " << endl;
+
+        for (int player = 0; player < game.num_players; player++){
+
+            cout << game.players[player].name << ": " << game.players[player].hand.size() << " cards" << endl;
+
+        }
+    }
+
+
 
 }
 
