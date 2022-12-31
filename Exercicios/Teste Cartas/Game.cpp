@@ -40,7 +40,7 @@ struct Player{
     vector<Card> hand;
     vector<Card> possible_plays;
     string name;
-    int score;
+    bool is_dead = false;
     int card_quantity = 0;
 
 };
@@ -57,9 +57,10 @@ struct Game{
     int to_buy = 0;
     int current_player = 0;
     int num_players = 2;
-    int num_cards_per_hand = 7;
+    int num_cards_per_hand = 29;
     int game_turns_played = 0;
     bool game_over = false;
+    bool deathmatch = false;
     
 };
 
@@ -452,26 +453,30 @@ void player_draw(Game& game, bool buy_card){
     // decides winner if buy deck is emptied
     if (game.deck.cards.empty()){
         
-        for (int players = 0; players < game.players.size(); players++){
-            for (int card = 0; card < game.players[players].hand.size(); card++){
+        game.players[game.current_player].is_dead = true;
+        cout << game.players[game.current_player].name << " has died!" << endl;
 
-                game.players[players].card_quantity = game.players[players].hand.size();
+    }
 
-            }
-        }
+    int alive_players = 0;
+    for(int players = 0; players < game.players.size(); players++){
 
-        for (int hand = 0; hand < game.players.size(); hand++){
-            
-            if (hand == 0){
-                game.winner = game.players[hand]; 
-            }else if ((game.winner.card_quantity) > (game.players[hand].card_quantity)){
-                game.winner = game.players[hand];
-            }
+        if (!game.players[players].is_dead){
+
+            alive_players++;
 
         }
+    }
 
-        game.game_over = true;  
+    if (alive_players == 1){
+        game.game_over = true;
 
+        for(int players = 0; players < game.players.size(); players++){
+
+            if (!game.players[players].is_dead){
+                game.winner = game.players[players];
+            }
+        }
     }
 }
 
@@ -632,6 +637,9 @@ void turn(Game& game){
     }
 
     get_next_player(game, false);
+    if (game.players[game.current_player].is_dead){
+        get_next_player(game, false);
+    }
     turn_ui(game);
     cout<< endl << "Press enter to end turn" << endl;
     cin.get();
@@ -688,33 +696,7 @@ void screen_clear(){
 
 void choose_winner(Game& game){
 
-    bool winner = false;
-    for (int players = 0; players < game.num_players; players++){
-
-        if (game.players[players].hand.empty()){
-
-            cout << game.players[players].name << " was the winner!!!";
-            winner = true;
-
-        }
-
-    }
-
-    if (!winner){
-
-        cout << "The winner was " << game.winner.name;
-        cout << " they had the least cards at " << game.winner.hand.size() << " cards";
-
-        cout << endl << " Everybody card count: " << endl;
-
-        for (int player = 0; player < game.num_players; player++){
-
-            cout << game.players[player].name << ": " << game.players[player].hand.size() << " cards" << endl;
-
-        }
-    }
-
-
+    cout << endl << "The winner was " << game.winner.name << "!!";
 
 }
 
