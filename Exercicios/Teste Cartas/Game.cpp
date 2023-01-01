@@ -5,7 +5,7 @@
 using namespace std;
 
 enum Color { BLACK, WHITE, YELLOW, BLUE, GREEN, RED, EMPTY_COLOR };
-enum Number { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, PLUS_TWO, EMPTY_NUMBER };
+enum Number { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, PLUS_TWO, PLUS_FOUR, PLUS_ONE, EMPTY_NUMBER };
 enum Animal { OCTOPUS, OWL, MOOSE, WOLF, GOAT, BEAR, EMPTY_ANIMAL };
 enum Type { HAND, INVENTORY, TERRITORY, EMPTY_TYPE };
 enum Strength { LOW, HIGH, SPECIAL, EMPTY_STRENGTH };  
@@ -19,6 +19,7 @@ struct Card{
     Strength card_strength;
     int num_number = 10;
     int num_color = 6;
+    bool is_plus;
 
 };
 
@@ -56,11 +57,11 @@ struct Game{
     int first_player = 0;
     int to_buy = 0;
     int current_player = 0;
-    int num_players = 10;
+    int num_players = 2;
     int num_cards_per_hand = 7;
     int game_turns_played = 0;
     bool game_over = false;
-    int deathmatch_msg = 0;
+    int bought_before_dm = 0;
     bool deathmatch = false;
     
 };
@@ -110,6 +111,7 @@ void initialize_deck(Deck& deck){
 
                 card.card_color = Color(color);
                 card.card_number = Number(number);
+                card.is_plus = false;
 
                 // Assigns the animal of the card
                 switch (color){
@@ -147,18 +149,45 @@ void initialize_deck(Deck& deck){
             }
         }
 
-        Card plus_card;
+        Card plus_two;
+        plus_two.is_plus = true;
+        plus_two.card_number = Number::PLUS_TWO;
+        
         for (int color = 0; color < card.num_color; color++){
             for (int i = 0; i < 2; i++){
 
-                plus_card.card_color = Color(color);
-                plus_card.card_number = Number::PLUS_TWO;
+                plus_two.card_color = Color(color);
 
-                deck.cards.push_back(plus_card);
+                deck.cards.push_back(plus_two);
 
             }
         }
 
+        Card plus_4;
+        plus_4.is_plus = true;
+        plus_4.card_number = Number::PLUS_FOUR;
+        
+        for (int color = 0; color < card.num_color; color++){
+            for (int i = 0; i < 2; i++){
+
+                plus_4.card_color = Color(color);
+
+                deck.cards.push_back(plus_4);
+
+            }
+        }
+
+        Card plus_1;
+        plus_1.is_plus = true;
+        plus_1.card_number = Number::PLUS_ONE;
+        
+        for (int color = 0; color < card.num_color; color++){
+
+            plus_1.card_color = Color(color);
+
+            deck.cards.push_back(plus_1);
+
+        }
 
 }
 
@@ -234,6 +263,12 @@ void print_card(const Card& card){
         break;
     case Number::PLUS_TWO:
         cout<<"plus two";
+        break;
+    case Number::PLUS_FOUR:
+        cout<<"plus four";
+        break;
+        case Number::PLUS_ONE:
+    cout<<"plus one";
         break;
     case Number::EMPTY_NUMBER:
         cout<<"empty";
@@ -397,13 +432,29 @@ void play_card(Game& game, int current_player, int action){
 
             temp_card.card_color = game.players[current_player].possible_plays[card].card_color;
             temp_card.card_number = game.players[current_player].possible_plays[card].card_number;
+            temp_card.is_plus = game.players[current_player].possible_plays[card].is_plus;
 
         }
     }
 
-    if (temp_card.card_number == Number::PLUS_TWO){
+    if (temp_card.is_plus){
 
-        game.to_buy = game.to_buy + 2;
+        switch (temp_card.card_number)
+        {
+        case Number::PLUS_ONE:
+            game.to_buy += 1;
+            break;
+        case Number::PLUS_TWO:
+            game.to_buy += 2;
+            break;
+        case Number::PLUS_FOUR:
+            game.to_buy += 4;
+            break;
+        
+        default:
+            cout << endl << endl << "ERROR - to_buy (play_card)" << endl << endl;
+            break;
+        }
 
     }
 
@@ -432,9 +483,9 @@ void player_draw(Game& game, bool buy_card){
         if (!game.deathmatch){
 
             game.players[game.current_player].hand.push_back(game.deck.cards[0]);
-            cout<<"There are " << (game.deck.cards.size() - 1) << " cards left in the deck" << endl;
-        
             game.deck.cards.erase(game.deck.cards.begin());
+            cout<<"There are " << (game.deck.cards.size()) << " cards left in the deck" << endl;
+        
         
             if (game.deck.cards.empty()){
 
@@ -470,7 +521,7 @@ void player_draw(Game& game, bool buy_card){
 
                 cout << "The game is now on deathmatch";
                 game.deathmatch = true;
-                game.deathmatch_msg = 1;
+                game.bought_before_dm = 1;
 
             }
 
@@ -539,7 +590,7 @@ void display_drawn(Game& game, bool buy_card){
                     cout << (buy_counter + 1) << ": ";
                     print_card(game.deck.cards[0]);
                     player_draw(game, buy_card);
-                } else if ((game.deathmatch) && (game.deathmatch_msg == 1)){
+                } else if ((game.deathmatch) && (game.bought_before_dm == 1)){
 
                     game.to_buy = 0;
                     return;
@@ -606,26 +657,32 @@ void play_action(Game& game, int current_player){
 
         for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
 
-            if ((game.last_played_card.card_number == Number::PLUS_TWO) && (game.to_buy != 0)){
-                if (game.players[game.current_player].hand[card].card_number == game.last_played_card.card_number){
+            if ((game.last_played_card.is_plus == true) && (game.to_buy != 0)){
+                if (game.players[game.current_player].hand[card].is_plus == true){
 
                     count++;
                     display_valid_card(game, count, card);
 
                 }
-            }else if ((game.last_played_card.card_number == Number::PLUS_TWO) && (game.to_buy = 0)){
-                if (game.players[game.current_player].hand[card].card_number == game.last_played_card.card_number){
+            }else if ((game.last_played_card.is_plus == true) && (game.to_buy = 0)){
+                if (game.players[game.current_player].hand[card].is_plus == true){
 
                     count++;
                     display_valid_card(game, count, card);
 
                 }else if (game.players[game.current_player].hand[card].card_color == game.last_played_card.card_color){
 
-                count++;
-                display_valid_card(game, count, card);
+                    count++;
+                    display_valid_card(game, count, card);
 
                 }
             } else if ((game.players[game.current_player].hand[card].card_color == game.last_played_card.card_color) || (game.players[game.current_player].hand[card].card_number == game.last_played_card.card_number)){
+
+                
+                count++;
+                display_valid_card(game, count, card);
+
+            } else if ((game.last_played_card.is_plus) && (game.players[game.current_player].hand[card].is_plus)){
 
                 count++;
                 display_valid_card(game, count, card);
@@ -634,7 +691,7 @@ void play_action(Game& game, int current_player){
         }
         if (count == 0){
             
-            if ((game.last_played_card.card_number == Number::PLUS_TWO) && (game.to_buy != 0)){
+            if ((game.last_played_card.is_plus) && (game.to_buy != 0)){
 
                 buy_card = true;
 
@@ -664,9 +721,38 @@ void get_next_player(Game& game, bool next_on_first){
     }
 }
 
+void player_view_order(Game& game){
+
+    if (game.played_deck.played_cards.empty()){
+
+        cout << endl << endl << "Game started!!!" << endl;
+
+    } else if (game.players[game.current_player].name == game.players.front().name){
+
+        cout << endl << endl << "Previous player: " << game.players.back().name << endl;
+
+    } else {
+
+        cout << endl << endl << "Previous player: " << game.players[(game.current_player - 1)].name << endl;
+
+    }
+
+    cout << "Current player: " << game.players[game.current_player].name << endl;
+    if (game.players[(game.current_player)].name == game.players.back().name){
+
+        cout << "Next player: " << game.players.front().name << endl << endl;
+
+    } else {
+
+    cout << "Next player: " << game.players[(game.current_player + 1)].name << endl << endl;
+
+    }
+
+}
+
 void turn_ui(Game& game){
 
-    int playing = game.current_player;
+    player_view_order(game);
     cout << game.players[game.current_player].name << " turn!"<<endl;
     last_played_info(game);
     if (game.deathmatch){
@@ -674,8 +760,8 @@ void turn_ui(Game& game){
     }     
     cout<< endl;
     cout << game.players[game.current_player].name << "'s hand: " << endl; 
-    print_hand(game.players[playing].hand);
-    play_action(game, playing);
+    print_hand(game.players[game.current_player].hand);
+    play_action(game, game.current_player);
 
 }
 
