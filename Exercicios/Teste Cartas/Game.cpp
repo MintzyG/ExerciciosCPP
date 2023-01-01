@@ -56,10 +56,11 @@ struct Game{
     int first_player = 0;
     int to_buy = 0;
     int current_player = 0;
-    int num_players = 2;
-    int num_cards_per_hand = 29;
+    int num_players = 10;
+    int num_cards_per_hand = 7;
     int game_turns_played = 0;
     bool game_over = false;
+    int deathmatch_msg = 0;
     bool deathmatch = false;
     
 };
@@ -427,34 +428,58 @@ void play_card(Game& game, int current_player, int action){
 void player_draw(Game& game, bool buy_card){
 
     if (!buy_card){
-        game.players[game.current_player].hand.push_back(game.deck.cards[0]);
-        cout<<"There are " << game.deck.cards.size() << " cards left in the deck" << endl;
         
-        game.deck.cards.erase(game.deck.cards.begin());
+        if (!game.deathmatch){
 
-        if ((game.players[game.current_player].hand.back().card_color == game.last_played_card.card_color) || (game.players[game.current_player].hand.back().card_number == game.last_played_card.card_number)) {
+            game.players[game.current_player].hand.push_back(game.deck.cards[0]);
+            cout<<"There are " << (game.deck.cards.size() - 1) << " cards left in the deck" << endl;
+        
+            game.deck.cards.erase(game.deck.cards.begin());
+        
+            if (game.deck.cards.empty()){
+
+                cout << "The game is now on deathmatch";
+                game.deathmatch = true;
+
+            }
+        
+
+            if ((game.players[game.current_player].hand.back().card_color == game.last_played_card.card_color) || (game.players[game.current_player].hand.back().card_number == game.last_played_card.card_number)) {
        
-            cin.get();
-            cout << endl << endl << "You can play the drawn card" << endl;
-            turn_ui(game);
+                cin.get();
+                cout << endl << endl << "You can play the drawn card" << endl;
+                turn_ui(game);
+
+            }
+
+        } else {
+
+            game.players[game.current_player].is_dead = true;
+            cout << game.players[game.current_player].name << " has died!" << endl;
 
         }
-        
 
     } else {
 
-        game.players[game.current_player].hand.push_back(game.deck.cards[0]);
-        game.deck.cards.erase(game.deck.cards.begin());
+        if (!game.deathmatch){
 
-    }
+            game.players[game.current_player].hand.push_back(game.deck.cards[0]);
+            game.deck.cards.erase(game.deck.cards.begin());
 
-    
+            if (game.deck.cards.empty()){
 
-    // decides winner if buy deck is emptied
-    if (game.deck.cards.empty()){
-        
-        game.players[game.current_player].is_dead = true;
-        cout << game.players[game.current_player].name << " has died!" << endl;
+                cout << "The game is now on deathmatch";
+                game.deathmatch = true;
+                game.deathmatch_msg = 1;
+
+            }
+
+        } else {
+
+            game.players[game.current_player].is_dead = true;
+            cout << game.players[game.current_player].name << " has died!" << endl;
+
+        }
 
     }
 
@@ -491,23 +516,47 @@ void display_valid_card(Game& game, size_t count, int card){
 void display_drawn(Game& game, bool buy_card){
 
     if (!buy_card){
-        cout << endl << game.players[game.current_player].name << " has to draw" << endl;
-        cout << game.players[game.current_player].name << " has drawn a ";
-        print_card(game.deck.cards[0]);
-        player_draw(game, buy_card);
-    } else {
 
-        cout << endl << game.players[game.current_player].name << " has to buy " << game.to_buy << " cards" << endl;  
-        for (int buy_counter = 0; buy_counter < game.to_buy; buy_counter++){
-
-            cout << game.players[game.current_player].name << " has drawn a ";
+        if (!game.deathmatch){
+            cout << endl << game.players[game.current_player].name << " has to draw" << endl;
+            cout << game.players[game.current_player].name << " has drawn a: ";
             print_card(game.deck.cards[0]);
+            player_draw(game, buy_card);
+        } else {
+
             player_draw(game, buy_card);
 
         }
 
-        cout<<"There are " << game.deck.cards.size() << " cards left in the deck" << endl;
-        game.to_buy = 0;
+    } else {
+
+        if (!game.deathmatch){
+            cout << endl << game.players[game.current_player].name << " has to buy " << game.to_buy << " cards" << endl;  
+            cout << game.players[game.current_player].name << " has drawn:" << endl;
+            for (int buy_counter = 0; buy_counter < game.to_buy; buy_counter++){
+
+                if (!game.deathmatch){
+                    cout << (buy_counter + 1) << ": ";
+                    print_card(game.deck.cards[0]);
+                    player_draw(game, buy_card);
+                } else if ((game.deathmatch) && (game.deathmatch_msg == 1)){
+
+                    game.to_buy = 0;
+                    return;
+
+                } 
+
+            }
+
+            cout<<"There are " << (game.deck.cards.size() - 1)<< " cards left in the deck" << endl;
+            game.to_buy = 0;
+
+        } else {
+
+            player_draw(game, buy_card);
+            game.to_buy = 0;
+
+        }
 
     }
 
@@ -619,7 +668,10 @@ void turn_ui(Game& game){
 
     int playing = game.current_player;
     cout << game.players[game.current_player].name << " turn!"<<endl;
-    last_played_info(game);     
+    last_played_info(game);
+    if (game.deathmatch){
+        cout << "The game is now in Deathmatch!" << endl;
+    }     
     cout<< endl;
     cout << game.players[game.current_player].name << "'s hand: " << endl; 
     print_hand(game.players[playing].hand);
