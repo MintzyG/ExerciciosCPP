@@ -503,9 +503,9 @@ void play_card(Game& game, int current_player, int action){
 
 } 
 
-void player_draw(Game& game, bool buy_card){
+void player_draw(Game& game){
 
-    if (!buy_card){
+    if (game.to_buy == 0){
         
         if (!game.deathmatch){
 
@@ -591,18 +591,18 @@ void display_valid_card(Game& game, size_t count, int card){
 
 }
 
-void display_drawn(Game& game, bool buy_card){
+void display_drawn(Game& game){
 
-    if (!buy_card){
+    if (game.to_buy == 0){
 
         if (!game.deathmatch){
             cout << endl << game.players[game.current_player].name << " has to draw" << endl;
             cout << game.players[game.current_player].name << " has drawn a: ";
             print_card(game.deck.cards[0]);
-            player_draw(game, buy_card);
+            player_draw(game);
         } else {
 
-            player_draw(game, buy_card);
+            player_draw(game);
 
         }
 
@@ -616,7 +616,7 @@ void display_drawn(Game& game, bool buy_card){
                 if (!game.deathmatch){
                     cout << (buy_counter + 1) << ": ";
                     print_card(game.deck.cards[0]);
-                    player_draw(game, buy_card);
+                    player_draw(game);
                 } else if ((game.deathmatch) && (game.bought_before_dm == 1)){
 
                     game.to_buy = 0;
@@ -631,7 +631,7 @@ void display_drawn(Game& game, bool buy_card){
 
         } else {
 
-            player_draw(game, buy_card);
+            player_draw(game);
             game.to_buy = 0;
 
         }
@@ -659,7 +659,6 @@ void play_action(Game& game, int current_player){
 
         size_t count = 0;
         int action;
-        bool buy_card;
 
         if (game.played_deck.played_cards.empty()){
             for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
@@ -673,7 +672,7 @@ void play_action(Game& game, int current_player){
             }
 
             if (count == 0){
-                display_drawn(game, false);
+                display_drawn(game);
                 get_next_player(game, true);
                 return;
             }
@@ -716,14 +715,8 @@ void play_action(Game& game, int current_player){
             }
         }
         if (count == 0){
-            
-            if ((game.last_played_card.is_plus) && (game.to_buy != 0)){
 
-                buy_card = true;
-
-            }
-
-            display_drawn(game, buy_card);
+            display_drawn(game);
             return;
         }
         
