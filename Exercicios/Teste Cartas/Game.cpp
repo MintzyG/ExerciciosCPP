@@ -5,7 +5,7 @@
 using namespace std;
 
 enum Color { BLACK, WHITE, YELLOW, BLUE, GREEN, RED, EMPTY_COLOR };
-enum Number { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, PLUS_TWO, PLUS_FOUR, PLUS_ONE, BLOCK, EMPTY_NUMBER };
+enum Number { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, PLUS_TWO, PLUS_FOUR, PLUS_ONE, BLOCK, REVERSE, EMPTY_NUMBER };
 enum Animal { OCTOPUS, OWL, MOOSE, WOLF, GOAT, BEAR, EMPTY_ANIMAL };
 enum Type { HAND, INVENTORY, TERRITORY, EMPTY_TYPE };
 enum Strength { LOW, HIGH, SPECIAL, EMPTY_STRENGTH };  
@@ -22,7 +22,7 @@ struct Card{
     bool is_plus;
 
 };
-
+ 
 struct Deck{
 
     vector<Card> cards;
@@ -57,13 +57,14 @@ struct Game{
     int first_player = 0;
     int to_buy = 0;
     int current_player = 0;
-    int num_players = 2;
+    int num_players = 3;
     int num_cards_per_hand = 7;
     int game_turns_played = 0;
     bool game_over = false;
     int bought_before_dm = 0;
     bool deathmatch = false;
     bool block_next = false;
+    bool is_reversed = false;
     
 };
 
@@ -206,6 +207,22 @@ void initialize_deck(Deck& deck){
             }
         }
 
+        Card reverse;
+        reverse.card_number = Number::REVERSE;
+        reverse.card_strength = Strength::LOW;
+        reverse.card_type = Type::HAND;
+        reverse.is_plus = false;
+
+        for (int color = 0; color < card.num_color; color++){
+            for (int i = 0; i < 3; i++){
+                
+                reverse.card_color = Color(color);
+
+                deck.cards.push_back(reverse);
+
+            }
+        }
+
 }
 
 void print_deck(const Deck& deck){
@@ -289,7 +306,10 @@ void print_card(const Card& card){
         break;
     case Number::BLOCK:
         cout<<"block";
-        break;    
+        break; 
+    case Number::REVERSE:
+        cout<<"reverse";
+        break; 
     case Number::EMPTY_NUMBER:
         cout<<"empty";
         break;
@@ -485,6 +505,12 @@ void play_card(Game& game, int current_player, int action){
 
     }
 
+    if (temp_card.card_number == Number::REVERSE){
+
+        game.is_reversed = !game.is_reversed;
+
+    }
+
     for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
      
         if ((game.players[game.current_player].hand[card].card_color == temp_card.card_color) && (game.players[game.current_player].hand[card].card_number == temp_card.card_number)){
@@ -660,6 +686,8 @@ void play_action(Game& game, int current_player){
         size_t count = 0;
         int action;
 
+        cout << endl << "Cartas validas para jogar: " << endl;
+
         if (game.played_deck.played_cards.empty()){
             for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
 
@@ -727,28 +755,53 @@ void play_action(Game& game, int current_player){
 
 void get_next_player(Game& game, bool next_on_first){
 
+    int next_player = 0;
+
     if (!next_on_first){
 
-        int next_player = (game.current_player + 1) % game.num_players;
-        game.current_player = next_player;
+        if (!game.is_reversed) {
 
-    }else{
+            next_player = (game.current_player + 1) % game.num_players;
+            game.current_player = next_player;
 
-        game.first_player = (game.current_player + 1) % game.num_players; 
-        game.current_player = game.first_player;
+        } else {
 
+            next_player = (game.current_player - 1) % game.num_players;
+            if (next_player < 0){
+
+                next_player = (game.players.size() - 1);
+
+            }
+            game.current_player = next_player;
+            cout<<"current player now is " << game.current_player;
+
+        }
+
+    } else {
+
+            game.first_player = (game.current_player + 1) % game.num_players; 
+            game.current_player = game.first_player;
     }
 }
 
 void player_view_order(Game& game){
 
+
     if (game.played_deck.played_cards.empty()){
 
         cout << endl << endl << "Game started!!!" << endl;
 
-    } else if (game.players[game.current_player].name == game.players.front().name){
+    } else if ((game.players[game.current_player].name == game.players.front().name) && (!game.is_reversed)){
 
         cout << endl << endl << "Previous player: " << game.players.back().name << endl;
+
+    } else if ((game.players[game.current_player].name == game.players.back().name) && (game.is_reversed)) {
+
+        cout << endl << endl << "Previous player: " << game.players.front().name << endl;
+
+    } else if ((game.players[game.current_player].name != game.players.back().name) && (game.is_reversed)) {
+
+        cout << endl << endl << "Previous player: " << game.players[(game.current_player + 1)].name << endl;
 
     } else {
 
@@ -756,14 +809,31 @@ void player_view_order(Game& game){
 
     }
 
-    cout << "Current player: " << game.players[game.current_player].name << endl;
-    if (game.players[(game.current_player)].name == game.players.back().name){
+    if (!game.is_reversed){
 
-        cout << "Next player: " << game.players.front().name << endl << endl;
+        cout << "Current player: " << game.players[game.current_player].name << endl;
+        if (game.players[(game.current_player)].name == game.players.back().name){
+
+            cout << "Next player: " << game.players.front().name << endl << endl;
+
+        } else {
+
+        cout << "Next player: " << game.players[(game.current_player + 1)].name << endl << endl;
+
+        }
 
     } else {
 
-    cout << "Next player: " << game.players[(game.current_player + 1)].name << endl << endl;
+        cout << "Current player: " << game.players[game.current_player].name << endl;
+        if (game.players[(game.current_player)].name == game.players.front().name){
+
+            cout << "Next player: " << game.players.back().name << endl << endl;
+
+        } else {
+
+        cout << "Next player: " << game.players[(game.current_player - 1)].name << endl << endl;
+
+        }
 
     }
 
@@ -772,7 +842,7 @@ void player_view_order(Game& game){
 void turn_ui(Game& game){
 
     player_view_order(game);
-    cout << game.players[game.current_player].name << " turn!"<<endl;
+    cout << game.players[game.current_player].name << "'s turn!"<<endl;
     last_played_info(game);
     if (game.deathmatch){
         cout << "The game is now in Deathmatch!" << endl;
@@ -788,7 +858,7 @@ void check_blocked(Game& game){
 
     if (game.block_next){
 
-        cout << "You blocked " << game.players[game.current_player].name;
+        cout << game.players[game.current_player].name << " was blocked";
         get_next_player(game, false);
         game.block_next = false;
 
