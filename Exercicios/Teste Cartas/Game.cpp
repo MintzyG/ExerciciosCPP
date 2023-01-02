@@ -5,7 +5,7 @@
 using namespace std;
 
 enum Color { BLACK, WHITE, YELLOW, BLUE, GREEN, RED, EMPTY_COLOR };
-enum Number { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, PLUS_TWO, PLUS_FOUR, PLUS_ONE, EMPTY_NUMBER };
+enum Number { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, PLUS_TWO, PLUS_FOUR, PLUS_ONE, BLOCK, EMPTY_NUMBER };
 enum Animal { OCTOPUS, OWL, MOOSE, WOLF, GOAT, BEAR, EMPTY_ANIMAL };
 enum Type { HAND, INVENTORY, TERRITORY, EMPTY_TYPE };
 enum Strength { LOW, HIGH, SPECIAL, EMPTY_STRENGTH };  
@@ -63,6 +63,7 @@ struct Game{
     bool game_over = false;
     int bought_before_dm = 0;
     bool deathmatch = false;
+    bool block_next = false;
     
 };
 
@@ -105,13 +106,13 @@ void initialize_deck(Deck& deck){
         Card card;
         card.card_strength = Strength::LOW;
         card.card_type = Type::HAND;
+        card.is_plus = false;
         
         for (int number = 0; number < card.num_number; number++){
             for (int color = 0; color < card.num_color; color++){
 
                 card.card_color = Color(color);
                 card.card_number = Number(number);
-                card.is_plus = false;
 
                 // Assigns the animal of the card
                 switch (color){
@@ -187,6 +188,22 @@ void initialize_deck(Deck& deck){
 
             deck.cards.push_back(plus_1);
 
+        }
+
+        Card block;
+        block.card_number = Number::BLOCK;
+        block.card_strength = Strength::LOW;
+        block.card_type = Type::HAND;
+        block.is_plus = false;
+
+        for (int color = 0; color < card.num_color; color++){
+            for (int i = 0; i < 3; i++){
+                
+                block.card_color = Color(color);
+
+                deck.cards.push_back(block);
+
+            }
         }
 
 }
@@ -267,9 +284,12 @@ void print_card(const Card& card){
     case Number::PLUS_FOUR:
         cout<<"plus four";
         break;
-        case Number::PLUS_ONE:
-    cout<<"plus one";
+    case Number::PLUS_ONE:
+        cout<<"plus one";
         break;
+    case Number::BLOCK:
+        cout<<"block";
+        break;    
     case Number::EMPTY_NUMBER:
         cout<<"empty";
         break;
@@ -425,14 +445,15 @@ void last_played_info(Game& game){
 void play_card(Game& game, int current_player, int action){
 
     Card temp_card;
-    
-    for (int card = 0; card < game.players[current_player].possible_plays.size(); card++){
+    bool block = false;
+
+    for (int card = 0; card < game.players[game.current_player].possible_plays.size(); card++){
 
         if (card == action){
 
-            temp_card.card_color = game.players[current_player].possible_plays[card].card_color;
-            temp_card.card_number = game.players[current_player].possible_plays[card].card_number;
-            temp_card.is_plus = game.players[current_player].possible_plays[card].is_plus;
+            temp_card.card_color = game.players[game.current_player].possible_plays[card].card_color;
+            temp_card.card_number = game.players[game.current_player].possible_plays[card].card_number;
+            temp_card.is_plus = game.players[game.current_player].possible_plays[card].is_plus;
 
         }
     }
@@ -458,15 +479,21 @@ void play_card(Game& game, int current_player, int action){
 
     }
 
-    for (int card = 0; card < game.players[current_player].hand.size(); card++){
+    if (temp_card.card_number == Number::BLOCK){
+
+        game.block_next = true;
+
+    }
+
+    for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
      
-        if ((game.players[current_player].hand[card].card_color == temp_card.card_color) && (game.players[current_player].hand[card].card_number == temp_card.card_number)){
+        if ((game.players[game.current_player].hand[card].card_color == temp_card.card_color) && (game.players[game.current_player].hand[card].card_number == temp_card.card_number)){
 
             cin.get();
             
-            game.played_deck.played_cards.push_back(game.players[current_player].hand[card]);
-            game.last_played_card = game.players[current_player].hand[card];
-            game.players[current_player].hand.erase(game.players[current_player].hand.begin() + (card));
+            game.played_deck.played_cards.push_back(game.players[game.current_player].hand[card]);
+            game.last_played_card = game.players[game.current_player].hand[card];
+            game.players[game.current_player].hand.erase(game.players[game.current_player].hand.begin() + (card));
 
         }
     
@@ -670,7 +697,7 @@ void play_action(Game& game, int current_player){
                     count++;
                     display_valid_card(game, count, card);
 
-                }else if (game.players[game.current_player].hand[card].card_color == game.last_played_card.card_color){
+                }else if ((game.players[game.current_player].hand[card].card_color == game.last_played_card.card_color) && (game.players[game.current_player].hand[card].is_plus == true)){
 
                     count++;
                     display_valid_card(game, count, card);
@@ -678,7 +705,6 @@ void play_action(Game& game, int current_player){
                 }
             } else if ((game.players[game.current_player].hand[card].card_color == game.last_played_card.card_color) || (game.players[game.current_player].hand[card].card_number == game.last_played_card.card_number)){
 
-                
                 count++;
                 display_valid_card(game, count, card);
 
@@ -765,6 +791,18 @@ void turn_ui(Game& game){
 
 }
 
+void check_blocked(Game& game){
+
+    if (game.block_next){
+
+        cout << "You blocked " << game.players[game.current_player].name;
+        get_next_player(game, false);
+        game.block_next = false;
+
+    }
+
+}
+
 void turn(Game& game){
 
     if (game.played_deck.played_cards.empty()){
@@ -778,6 +816,7 @@ void turn(Game& game){
     if (game.players[game.current_player].is_dead){
         get_next_player(game, false);
     }
+    check_blocked(game);
     turn_ui(game);
     cout<< endl << "Press enter to end turn" << endl;
     cin.get();
