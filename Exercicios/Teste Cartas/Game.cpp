@@ -4,8 +4,8 @@
 #include <cstdlib>
 using namespace std;
 
-enum Color { BLACK, WHITE, YELLOW, BLUE, GREEN, RED, EMPTY_COLOR };
-enum Number { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, PLUS_TWO, PLUS_FOUR, PLUS_ONE, BLOCK, REVERSE, EMPTY_NUMBER };
+enum Color { BLACK, WHITE, YELLOW, BLUE, GREEN, RED, ANY, EMPTY_COLOR };
+enum Number { ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, PLUS_TWO, PLUS_FOUR, PLUS_ONE, BLOCK, REVERSE, CHOOSE_COLOR, EMPTY_NUMBER };
 enum Animal { OCTOPUS, OWL, MOOSE, WOLF, GOAT, BEAR, EMPTY_ANIMAL };
 enum Type { HAND, INVENTORY, TERRITORY, EMPTY_TYPE };
 enum Strength { LOW, HIGH, SPECIAL, EMPTY_STRENGTH };  
@@ -223,6 +223,20 @@ void initialize_deck(Deck& deck){
             }
         }
 
+        Card choose_color;
+        choose_color.card_number = Number::CHOOSE_COLOR;
+        choose_color.card_color = Color::ANY;
+        choose_color.card_strength = Strength::HIGH;
+        choose_color.card_type = Type::HAND;
+        choose_color.is_plus = false;
+
+        for (int i = 0; i < 8; i++){
+                
+            deck.cards.push_back(choose_color);
+
+        }
+        
+        
 }
 
 void print_deck(const Deck& deck){
@@ -259,6 +273,9 @@ void print_card(const Card& card){
     case Color::EMPTY_COLOR:
         cout<<"Empty ";
         break;
+    case Color::ANY:
+        cout<<"";
+        break;    
     default:
         cout<<"error ";
         break;
@@ -313,6 +330,9 @@ void print_card(const Card& card){
     case Number::EMPTY_NUMBER:
         cout<<"empty";
         break;
+    case Number::CHOOSE_COLOR:
+        cout<<"Choose color";
+        break;    
     default:
         cout<<"error";
         break;
@@ -511,12 +531,33 @@ void play_card(Game& game, int current_player, int action){
 
     }
 
+    bool change_color = false;
+    int new_color = 0;
+    if (temp_card.card_number == Number::CHOOSE_COLOR){
+
+        change_color = true;
+        cout << endl << "Which color would you like to play?" << endl;
+        cout << "1: Black" << endl << "2: White" << endl << "3: Yellow" << endl 
+        << "4: Blue" << endl << "5: Green" << endl << "6: Red" << endl;
+
+        do {
+            cin >> new_color;
+        } while ((new_color <= 0) || (new_color > 6));
+
+    }
+
     for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
      
         if ((game.players[game.current_player].hand[card].card_color == temp_card.card_color) && (game.players[game.current_player].hand[card].card_number == temp_card.card_number)){
 
             cin.get();
             
+            if (change_color){
+
+                game.players[game.current_player].hand[card].card_color = Color(new_color - 1);
+
+            }
+
             game.played_deck.played_cards.push_back(game.players[game.current_player].hand[card]);
             game.last_played_card = game.players[game.current_player].hand[card];
             game.players[game.current_player].hand.erase(game.players[game.current_player].hand.begin() + (card));
@@ -686,7 +727,7 @@ void play_action(Game& game, int current_player){
         size_t count = 0;
         int action;
 
-        cout << endl << "Cartas validas para jogar: " << endl;
+        cout << endl << "Playable Cards: " << endl;
 
         if (game.played_deck.played_cards.empty()){
             for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
@@ -696,7 +737,12 @@ void play_action(Game& game, int current_player){
                     count++;
                     display_valid_card(game, count, card);
 
-                } 
+                } else if (game.players[game.current_player].hand[card].card_color == Color::ANY){
+
+                    count++;
+                    display_valid_card(game, count, card);
+                
+                }
             }
 
             if (count == 0){
@@ -740,6 +786,11 @@ void play_action(Game& game, int current_player){
                 count++;
                 display_valid_card(game, count, card);
 
+            } else if (game.players[game.current_player].hand[card].card_color == Color::ANY){
+
+                count++;
+                display_valid_card(game, count, card);
+
             }
         }
         if (count == 0){
@@ -773,7 +824,6 @@ void get_next_player(Game& game, bool next_on_first){
 
             }
             game.current_player = next_player;
-            cout<<"current player now is " << game.current_player;
 
         }
 
