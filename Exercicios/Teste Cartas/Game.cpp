@@ -641,11 +641,26 @@ void player_draw(Game& game){
             }
         
 
-            if ((game.players[game.current_player].hand.back().card_color == game.last_played_card.card_color) || (game.players[game.current_player].hand.back().card_number == game.last_played_card.card_number)) {
+            if ((game.players[game.current_player].hand.back().card_color == game.last_played_card.card_color) || (game.players[game.current_player].hand.back().card_number == game.last_played_card.card_number) || (game.players[game.current_player].hand.back().card_number == Number::CHOOSE_COLOR)) {
        
-                cin.get();
                 cout << endl << endl << "You can play the drawn card" << endl;
-                turn_ui(game);
+                cout << "1: Play" << endl << "2: Skip" << endl;
+                int choice = 0;
+                do {
+
+                    cin >> choice;
+
+                } while ((choice < 1) || (choice > 2)); 
+
+                if (choice == 1){
+
+                    turn_ui(game);
+
+                } else if (choice == 2){
+
+                    cout << endl << "You skipped your turn" << endl;
+
+                }       
 
             }
 
@@ -1099,13 +1114,17 @@ void turn(Game& game){
 
 bool check_win_condition(Game& game){
 
-    for (int player = 0; player < game.num_players; player++){
+    if (game.to_buy == 0){
+        for (int player = 0; player < game.num_players; player++){
 
-        if (game.players[player].hand.empty()){
-            return true;
+            if (game.players[player].hand.empty()){
+                return true;
+            }
+
         }
-
+        return false;
     }
+
     return false;
 
 }
