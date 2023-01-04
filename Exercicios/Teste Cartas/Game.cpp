@@ -776,24 +776,65 @@ void player_play_action(Game& game, int current_player){
 
 }
 
-void matching_color_only(Game& game, int card){
+void validate_play(Game& game, int card){
+
+    game.valid_play_count++;
+    display_valid_card(game, card);
+
+}
+
+bool matching_to_start_color(Game& game, int card){
 
     if (game.players[game.current_player].hand[card].card_color == game.starting_color){
 
-        game.valid_play_count++;
-        display_valid_card(game, card);
+        return true;
+
+    } else {
+
+        return false;
 
     }
 
 }
 
-void any_color_match(Game& game, int card){
+bool any_color_match(Game& game, int card){
 
     if (game.players[game.current_player].hand[card].card_color == Color::ANY){
 
-        game.valid_play_count++;
-        display_valid_card(game, card);
-                
+        return true;
+
+    } else {
+
+        return false;
+
+    }
+
+}
+
+bool number_match(Game& game, int card){
+
+    if (game.players[game.current_player].hand[card].card_number == game.last_played_card.card_number){
+
+        return true;
+
+    } else {
+
+        return false;
+
+    }
+
+}
+
+bool color_match(Game& game, int card){
+
+    if (game.players[game.current_player].hand[card].card_color == game.last_played_card.card_color){
+
+        return true;
+
+    } else {
+
+        return false;
+
     }
 
 }
@@ -810,15 +851,39 @@ bool if_no_playable_cards(Game& game){
 
 }
 
-bool first_turn(Game& game){
+bool check_if_first_turn(Game& game){
 
     if (game.played_deck.played_cards.empty()){
-        for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
 
-            matching_color_only(game, card);
-            any_color_match(game, card);
-            
+        return true;
+
+    } else {
+
+        return false;
+
+    }
+
+}
+
+void first_turn_check_card(Game& game){
+
+    for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
+
+        if ((matching_to_start_color(game, card)) || (any_color_match(game, card))){
+
+            validate_play(game, card);
+
         }
+            
+    }
+
+}
+
+bool first_turn_play(Game& game){
+
+    if (check_if_first_turn(game)){
+        
+        first_turn_check_card(game);
 
         if (if_no_playable_cards(game)){
             return true;
@@ -832,6 +897,44 @@ bool first_turn(Game& game){
 
 }
 
+bool if_card_is_plus(Game& game, int card){
+
+    if (game.players[game.current_player].hand[card].is_plus == true){
+
+        return true;
+
+    } else {
+
+        return false;
+
+    }
+
+}
+
+void check_valid_cards(Game& game, int card){
+
+    if (game.to_buy != 0){
+            
+        if (if_card_is_plus(game, card)){
+            validate_play(game, card);
+        }
+
+    }else if ((game.last_played_card.is_plus == true) && (game.to_buy = 0)){
+            
+        if ((if_card_is_plus(game, card)) || (color_match(game, card)) || any_color_match(game, card)){
+
+            validate_play(game, card);
+
+        }
+
+    } else if ((color_match(game, card)) || (number_match(game, card)) || (any_color_match(game, card))){
+
+        validate_play(game, card);
+
+    } 
+
+}
+
 void play_action(Game& game){
 
     game.valid_play_count = 0;
@@ -839,52 +942,21 @@ void play_action(Game& game){
 
     cout << endl << "Playable Cards: " << endl;
 
-    if (first_turn(game)){
+    if (first_turn_play(game)){
         return;
     }
 
     for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
 
-        if ((game.last_played_card.is_plus == true) && (game.to_buy != 0)){
-            if (game.players[game.current_player].hand[card].is_plus == true){
+        check_valid_cards(game, card);
 
-                game.valid_play_count++;
-                display_valid_card(game, card);
-
-            }
-        }else if ((game.last_played_card.is_plus == true) && (game.to_buy = 0)){
-            if (game.players[game.current_player].hand[card].is_plus == true){
-
-                game.valid_play_count++;
-                display_valid_card(game, card);
-
-            }else if ((game.players[game.current_player].hand[card].card_color == game.last_played_card.card_color) && (game.players[game.current_player].hand[card].is_plus == true)){
-
-                game.valid_play_count++;
-                display_valid_card(game, card);
-
-            }
-        } else if ((game.players[game.current_player].hand[card].card_color == game.last_played_card.card_color) || (game.players[game.current_player].hand[card].card_number == game.last_played_card.card_number)){
-
-            game.valid_play_count++;
-            display_valid_card(game, card);
-
-        } else if ((game.last_played_card.is_plus) && (game.players[game.current_player].hand[card].is_plus)){
-
-            game.valid_play_count++;
-            display_valid_card(game, card);
-
-        } else if (game.players[game.current_player].hand[card].card_color == Color::ANY){
-
-            game.valid_play_count++;
-            display_valid_card(game, card);
-
-        }
     }
+    
     if (game.valid_play_count == 0){
 
         display_drawn(game);
         return;
+        
     }
         
     player_play_action(game, game.current_player);
