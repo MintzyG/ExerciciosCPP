@@ -54,20 +54,20 @@ struct Game{
     Color starting_color;
     Card last_played_card;
     Player winner;
-    size_t valid_play_count = 0;
+    size_t valid_play_count = 1;
     int first_player = 0;
     int to_buy = 0;
     int current_player = 0;
     int num_players = 3;
     int num_cards_per_hand = 7;
     int game_turns_played = 0;
-    bool game_over = false;
     int bought_before_dm = 0;
+    bool game_over = false;
     bool deathmatch = false;
     bool block_next = false;
     bool is_reversed = false;
     bool change_color = false;
-    
+
 };
 
 void initialize_deck(Deck&);
@@ -92,6 +92,7 @@ void choose_winner(Game&);
 void show_finished_game(Game&);
 void show_turns(Game&);
 void turn_ui(Game&);
+void display_drawn(Game&);
 
 int main(){
 
@@ -607,10 +608,15 @@ int check_strongs(Game& game, Card card, int new_color){
 
 }
 
-void check_card(Game& game, int current_player, int action){
+void check_card(Game& game, int action){
 
     game.change_color = false;
     int new_color = 0;
+
+    if (action == -1){
+        display_drawn(game);
+        return;
+    }
 
     Card temp_card = find_played_card(game, action);
 
@@ -774,19 +780,17 @@ void display_drawn(Game& game){
 
 }
 
-void player_play_action(Game& game, int current_player){
+void player_play_action(Game& game){
 
-    int action = -1;
+    int action = 0;
 
     cout << "What card do you want to play?" << endl;
-    while ((action < 0) || (action > ((game.players[game.current_player].possible_plays.size()) - 1))){
-            
+    do {
         cin >> action;
-        action--;
-            
-    }   
+        action -= 2;
+    } while (((action < -2) || (action > ((game.players[game.current_player].possible_plays.size()) - 1))) && (action != -1)); 
 
-    check_card(game, current_player, action);
+    check_card(game, action);
     game.players[game.current_player].possible_plays.clear();
 
 }
@@ -856,7 +860,7 @@ bool color_match(Game& game, int card){
 
 bool if_no_playable_cards(Game& game){
 
-    if (game.valid_play_count == 0){
+    if (game.valid_play_count == 1){
         display_drawn(game);
         get_next_player(game, true);
         return true;
@@ -904,7 +908,7 @@ bool first_turn_play(Game& game){
             return true;
         }
             
-        player_play_action(game, game.current_player);
+        player_play_action(game);
         return true;
     }
 
@@ -952,14 +956,21 @@ void check_valid_cards(Game& game, int card){
 
 void play_action(Game& game){
 
-    game.valid_play_count = 0;
+    game.valid_play_count = 1;
     int action;
 
-    cout << endl << "Playable Cards: " << endl;
+    cout << endl << "Playable Actions: " << endl;
 
     if (first_turn_play(game)){
         return;
     }
+
+    if (game.to_buy == 0){
+        cout << "1: Buy a card" << endl;
+    } else {
+        cout << "1: Buy the sequence" << endl;
+    }
+    
 
     for (int card = 0; card < game.players[game.current_player].hand.size(); card++){
 
@@ -967,14 +978,14 @@ void play_action(Game& game){
 
     }
     
-    if (game.valid_play_count == 0){
+    if (game.valid_play_count == 1){
 
         display_drawn(game);
         return;
         
     }
         
-    player_play_action(game, game.current_player);
+    player_play_action(game);
     return;
 
     }
