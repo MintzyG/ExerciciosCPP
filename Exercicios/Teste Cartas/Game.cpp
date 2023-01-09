@@ -974,6 +974,28 @@ void player_view_order(Game& game){
 
 }
 
+void matching_cards(Game& game){
+
+    int count = 0;
+    for (int cards = 0; cards < game.players[game.current_player].hand.size(); cards++){
+
+        Card card = game.players[game.current_player].hand[cards];
+
+        if (check_if_first_turn(game)){
+            if(ft_card_check(game, card)){
+                count++;
+            }
+        } else {
+            if (card_check(game, card)){
+                count++;
+            }
+        }
+    }
+
+    cout << "You have " << count << " playable cards" << endl;
+
+}
+
 void turn_ui(Game& game){
 
     player_view_order(game);
@@ -982,8 +1004,8 @@ void turn_ui(Game& game){
     if (game.deathmatch){
         cout << "The game is now in Deathmatch!" << endl;
     }     
-    cout<< endl;
-    cout << game.players[game.current_player].name << "'s hand: " << endl; 
+    matching_cards(game);
+    cout << endl << game.players[game.current_player].name << "'s hand: " << endl; 
     print_hand(game.players[game.current_player].hand);
     play_turns(game);
 
@@ -1075,16 +1097,12 @@ void screen_clear(){
 }
 
 void choose_winner(Game& game){
-
     cout << endl << "The winner was " << game.winner.name << "!!";
-
 }
 
 void show_finished_game(Game& game){
 
-    cout<<endl<<endl;
-
-    cout<<"The game sequence was: "<<endl<<endl;
+    cout<<endl<<endl<<"The game sequence was: "<<endl<<endl;
     print_hand(game.played_deck.played_cards);
     cout<<endl<<endl;
 
