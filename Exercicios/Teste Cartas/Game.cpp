@@ -20,7 +20,9 @@ struct Card{
     int num_number = 10;
     int num_color = 6;
     bool is_plus;
-
+    int played_by = 0;
+    bool has_bought = false;
+    int buy_amount = 0;
 };
  
 struct Deck{
@@ -75,7 +77,7 @@ void print_deck(const Deck&);
 void print_card(const Card&);
 void shuffle_deck(Deck&);
 bool deal_cards(Game&); 
-void print_hand(const vector<Card>&);
+void print_hand(const vector<Card>&, bool, Game&);
 void initialize_game(Game&);
 void add_players(Game&);
 void print_game(const Game&); 
@@ -382,14 +384,22 @@ bool deal_cards(Game& game){
 
 }
 
-void print_hand(const vector<Card>& hand){
+void print_hand(const vector<Card>& hand, bool game_finished, Game& game){
 
     int counter = 1;
     for (Card c : hand){
 
-        cout<<counter<<": ";
+        cout<<counter<<":";
+        if(c.has_bought){
+            cout << game.players[c.played_by].name << " bought: " << c.buy_amount << " cards";    
+        } else if (game_finished){
+            cout << game.players[c.played_by].name << " played: ";
+        } else {
+            cout<< " ";
+        }
         counter++;
         print_card(c);
+        
 
     }
     cout<<endl;
@@ -421,11 +431,11 @@ void add_players(Game& game){
 }
 
 // Debug tool
-void print_game(const Game& game){
+void print_game(Game& game){
 
     for(int player = 0; player < game.num_players; player++){
 
-        print_hand(game.players[player].hand);
+        print_hand(game.players[player].hand, false, game);
         
     }
 
@@ -793,6 +803,7 @@ void do_play(Game& game, Card& played_card, int new_color){
 
             }
 
+            game.players[game.current_player].hand[cards].played_by = game.current_player;
             game.played_deck.played_cards.push_back(game.players[game.current_player].hand[cards]);
             game.last_played_card = game.players[game.current_player].hand[cards];
             game.players[game.current_player].hand.erase(game.players[game.current_player].hand.begin() + (cards));
@@ -878,6 +889,16 @@ void play_turns(Game& game){
                 }
             }
         } else {
+
+            Card bought;
+            bought.has_bought = true;
+            bought.played_by = game.current_player;
+            if (game.to_buy == 0){
+                bought.buy_amount = 1;
+            } else {
+                bought.buy_amount = game.to_buy;
+            }
+            game.played_deck.played_cards.push_back(bought);
 
             // Make a better draw function
             display_drawn(game);
@@ -1006,7 +1027,7 @@ void turn_ui(Game& game){
     }     
     matching_cards(game);
     cout << endl << game.players[game.current_player].name << "'s hand: " << endl; 
-    print_hand(game.players[game.current_player].hand);
+    print_hand(game.players[game.current_player].hand, false, game);
     play_turns(game);
 
 }
@@ -1103,7 +1124,7 @@ void choose_winner(Game& game){
 void show_finished_game(Game& game){
 
     cout<<endl<<endl<<"The game sequence was: "<<endl<<endl;
-    print_hand(game.played_deck.played_cards);
+    print_hand(game.played_deck.played_cards, true, game);
     cout<<endl<<endl;
 
 }
